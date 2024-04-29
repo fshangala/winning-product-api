@@ -3,6 +3,10 @@ from selenium.webdriver.chrome.options import Options
 from enum import Enum
 from bs4 import BeautifulSoup
 import time
+import os
+from supabase import create_client, Client
+import json
+import queue, threading
 
 class ActiveStatus(Enum):
   ALL="all"
@@ -16,6 +20,9 @@ class Facebook:
     options.add_argument('--disable-gpu')
 
     self.driver = webdriver.Chrome(options=options)
+    key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ewogICJyb2xlIjogImFub24iLAogICJpc3MiOiAic3VwYWJhc2UiLAogICJpYXQiOiAxNzEzMzA0ODAwLAogICJleHAiOiAxODcxMDcxMjAwCn0.wzm6GJDkA5uIKsaUcZPHG2mm-lCDIHCaFX1GiWlXDtQ"
+    url="http://copiwin.com:8000"
+    self.supabase = create_client(url,key)
     
   def adDetails(self,ad)->list:
     """
@@ -40,7 +47,7 @@ class Facebook:
     ads = list(list(adsContainer.children)[0].children)
     return ads
   
-  def fetch(self,active_status=ActiveStatus.ALL):
+  def fetch(self,session,active_status=ActiveStatus.ALL):
     """
     Fetch ads page source
     """
@@ -53,4 +60,10 @@ class Facebook:
       for detail in self.adDetails(ad):
         details.append(detail.text)
       text_ads.append(details)
-    return text_ads
+    ads_data={"ads":text_ads}
+    result = self.supabase.table("facebookads").insert({
+      "data":json.dumps(ads_data),
+      "session":session,
+    }).execute()
+    print(result)
+    return result

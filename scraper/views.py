@@ -2,13 +2,20 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.response import Response
 from ScraperSDK.facebook import Facebook
+from django.utils import timezone
+import threading
 
 # Create your views here.
 class FacebookAdsViewset(viewsets.ViewSet):
   def __init__(self,*args,**kwargs):
     super().__init__(*args,**kwargs)
-    self.facebook=Facebook()
+    
+  def fetchAds(self,session):
+    facebook = Facebook()
+    facebook.fetch(session=session)
     
   def list(self,request):
-    ads = self.facebook.fetch()
-    return Response(ads)
+    session = f"{timezone.now().timestamp()}"
+    threading.Thread(target=self.fetchAds,daemon=True,kwargs={"session":session}).start()
+    
+    return Response({"session":session})
