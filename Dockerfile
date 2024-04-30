@@ -2,7 +2,7 @@
 FROM python:3.10-alpine
 RUN apk update
 RUN apk add chromium
-RUN apk add chromedriver
+RUN apk add chromium-chromedriver
 WORKDIR /code
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
