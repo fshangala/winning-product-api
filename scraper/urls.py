@@ -3,3 +3,4 @@ from . import views
 
 scraperRouter = DefaultRouter()
 scraperRouter.register(r'facebook-ads',views.FacebookAdsViewset,basename='facebook-ads')
+scraperRouter.register(r'tiktok-ads',views.TikTokAdsViewset,basename='tiktok-ads')

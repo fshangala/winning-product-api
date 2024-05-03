@@ -5,6 +5,18 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Python Debugger: Copiwin",
+      "type": "debugpy",
+      "request": "launch",
+      "args": [
+        "runserver",
+        "0.0.0.0:8001"
+      ],
+      "django": true,
+      "autoStartBrowser": false,
+      "program": "${workspaceFolder}/manage.py"
+    },
+    {
       "name": "Python Debugger: Django",
       "type": "debugpy",
       "request": "launch",
