@@ -21,6 +21,7 @@ class AuthToken(ObtainAuthToken):
 class GetUserByEmail(ViewSet):
   def list(self,request,*args,**kwargs):
     email = request.GET.get("email",None)
+    print(email)
     if email:
       user = User.objects.get(email=email)
       return Response({
