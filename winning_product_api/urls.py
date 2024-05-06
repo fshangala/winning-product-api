@@ -19,12 +19,16 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
 from scraper.urls import scraperRouter
+from accounts.urls import accountsRouter
+
 router = routers.DefaultRouter()
 router.registry.extend(scraperRouter.registry)
+router.registry.extend(accountsRouter.registry)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
+    path('accounts/',include('accounts.urls', namespace='accounts')),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
 
