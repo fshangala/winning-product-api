@@ -18,6 +18,65 @@ class AuthToken(ObtainAuthToken):
       'email': user.email
     })
 
+class CreatePassword(ViewSet):
+  def create(self,request,*args,**kwargs):
+    email = request.GET.get("email",None)
+    if email:
+      pass
+    else:
+      return Response({
+        "email": [
+          "email is required"
+        ]
+      },401)
+
+class GetOrCreateUserByEmail(ViewSet):
+  def list(self,request,*args,**kwargs):
+    email = request.GET.get("email",None)
+    if email:
+      try:
+        user = User.objects.get(email=email)
+      except User.DoesNotExist:
+        firstName = request.GET.get("firstName",None)
+        lastName = request.GET.get("lastName",None)
+        if firstName and lastName:
+          user = User.objects.create(
+            username=email,
+            email=email,
+            first_name=firstName,
+            last_name=lastName
+          )
+          created_password = f"{user.id}@copiwin.com"
+          user.set_password(created_password)
+          user.save()
+          return Response({
+            'token':user.auth_token.key,
+            'user_id':user.id,
+            'email':user.email,
+            'password':created_password
+          },200)
+        else:
+          return Response({
+            "firstName": [
+              "firstName is required"
+            ],
+            "lastName": [
+              "lastName is required"
+            ],
+          },401)
+      else:
+        return Response({
+          'token':user.auth_token.key,
+          'user_id':user.id,
+          'email':user.email
+        },200)
+    else:
+      return Response({
+        "email": [
+          "email is required"
+        ]
+      },401)
+
 class GetUserByEmail(ViewSet):
   def list(self,request,*args,**kwargs):
     email = request.GET.get("email",None)
