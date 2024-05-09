@@ -27,5 +27,13 @@ class TikTokAdsViewset(viewsets.ViewSet):
   
   def list(self,request):
     tiktok = TiktokAPI()
-    response = tiktok.getAds()
-    return Response(response)
+    search_term = request.GET.get("search_term",None)
+    print(search_term)
+    if search_term:
+      response = tiktok.getAds(search_term=search_term)
+      print(response)
+      return Response(response)
+    else:
+      return Response({
+        "error":"search_term is required!"
+      })

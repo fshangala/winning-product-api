@@ -1,6 +1,14 @@
 import urllib.parse
 import requests
 
+class DateRange:
+  def __init__(self,min:str, max:str):
+    self.min = min
+    self.max = max
+
+class Countries:
+  US="US"
+
 class TiktokAPI:
   def __init__(self):
     self.access_token=None
@@ -22,7 +30,12 @@ class TiktokAPI:
     
     return responseData
 
-  def getAds(self):
+  def getAds(
+      self,
+      search_term:str,
+      country:str=Countries.US,
+      ad_published_date_range:DateRange=DateRange("20240401","20240501")
+    ):
     tokenResponse = self.getAccessToken()
     if tokenResponse.get("error",None):
       return tokenResponse
@@ -32,15 +45,16 @@ class TiktokAPI:
       json={
         "filters": {
           "ad_published_date_range": {
-            "min": "20240101",
-            "max": "20240401"
+            "min": ad_published_date_range.min,
+            "max": ad_published_date_range.max
           },
-          "country": "ZM"
+          "country": country
         },
-        "search_term": "coffee"
+        "search_term": search_term,
+        "max_count":12
       },
       params={
-        "fields":"ad.id,ad.reach,ad.videos"
+        "fields":"ad.id,ad.reach,ad.videos,advertiser.business_name,ad.image_urls"
       },
       headers={
         "Content-Type":"application/json",
