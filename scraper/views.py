@@ -3,6 +3,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from ScraperSDK.facebook import Facebook
 from ApiSDK.tiktok import TiktokAPI
+from ApiSDK.facebook import FacebookAPI
 from django.utils import timezone
 import threading
 
@@ -11,15 +12,16 @@ class FacebookAdsViewset(viewsets.ViewSet):
   def __init__(self,*args,**kwargs):
     super().__init__(*args,**kwargs)
     
-  def fetchAds(self,session):
-    facebook = Facebook()
-    facebook.fetch(session=session)
-    
   def list(self,request):
-    session = f"{timezone.now().timestamp()}"
-    threading.Thread(target=self.fetchAds,daemon=True,kwargs={"session":session}).start()
-    
-    return Response({"session":session})
+    facebook = FacebookAPI()
+    search_term = request.GET.get("search_term",None)
+    if search_term:
+      response = facebook.getAds(search_term=search_term)
+      return Response(response)
+    else:
+      return Response({
+        "error":"search_term is required!"
+      })
 
 class TikTokAdsViewset(viewsets.ViewSet):
   def __init__(self,*args,**kwargs):
