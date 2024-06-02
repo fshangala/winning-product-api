@@ -34,7 +34,7 @@ class FacebookAPI:
 
   def __init__(self) -> None:
     self.access_key = None
-    self.ads_api_endpoint = "https://graph.facebook.com/v19.0/ads_archive"
+    self.ads_api_endpoint = "https://graph.facebook.com/v19.0/ads_archive?fields=id,ad_snapshot_url,ad_creation_time"
 
   def get_access_key(self) -> str:
     """
@@ -81,8 +81,16 @@ class FacebookAPI:
     responseData = response.json()
     for ad in responseData['data']:
       facebookAd = FacebookAd(ad['ad_snapshot_url'])
+
       display_format=facebookAd.getAttribute('display_format')
       ad['display_format']=display_format
+
+      ad['title']=facebookAd.getAttribute('title')
+
+      ad['page_name']=facebookAd.getAttribute('page_name')
+
+      page_profile_picture_url=facebookAd.getAttribute('page_profile_picture_url')
+      ad['page_profile_picture_url']=self.unslash(page_profile_picture_url)
 
       video_url=facebookAd.getAttribute('video_sd_url')
       if video_url:

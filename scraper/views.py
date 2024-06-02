@@ -1,11 +1,7 @@
-from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.response import Response
-from ScraperSDK.facebook import Facebook
 from ApiSDK.tiktok import TiktokAPI
 from ApiSDK.facebook import FacebookAPI
-from django.utils import timezone
-import threading
 
 # Create your views here.
 class FacebookAdsViewset(viewsets.ViewSet):
