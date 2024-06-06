@@ -34,7 +34,7 @@ class FacebookAPI:
 
   def __init__(self) -> None:
     self.access_key = None
-    self.ads_api_endpoint = "https://graph.facebook.com/v19.0/ads_archive?fields=id,ad_snapshot_url,ad_creation_time"
+    self.ads_api_endpoint = "https://graph.facebook.com/v19.0/ads_archive?fields=id,ad_snapshot_url,ad_creation_time,ad_creative_bodies,ad_creative_link_captions,ad_creative_link_descriptions,ad_creative_link_titles,ad_delivery_start_time,ad_delivery_stop_timeage_country_gender_reach_breakdown,beneficiary_payers,bylines,currency,delivery_by_region,demographic_distribution,estimated_audience_size,eu_total_reach,impressions,languages,page_id,page_name,publisher_platforms,spend,target_ages,target_gender,target_locations"
 
   def get_access_key(self) -> str:
     """
@@ -85,7 +85,10 @@ class FacebookAPI:
       display_format=facebookAd.getAttribute('display_format')
       ad['display_format']=display_format
 
-      ad['title']=facebookAd.getAttribute('title')
+      title=facebookAd.getAttribute('title')
+      ad['title']=self.unslash(title)
+
+      ad['body']=facebookAd.getAttribute('body')
 
       ad['page_name']=facebookAd.getAttribute('page_name')
 

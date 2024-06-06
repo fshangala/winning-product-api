@@ -54,7 +54,7 @@ class TiktokAPI:
         "max_count":12
       },
       params={
-        "fields":"ad.id,ad.reach,ad.videos,advertiser.business_name,ad.image_urls"
+        "fields":"ad.id,ad.first_shown_date,ad.last_shown_date,ad.status,ad.status_statement,ad.videos,ad.image_urls,ad.reach,advertiser.business_id,advertiser.business_name,advertiser.paid_for_by"
       },
       headers={
         "Content-Type":"application/json",
