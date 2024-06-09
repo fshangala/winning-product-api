@@ -85,11 +85,6 @@ class FacebookAPI:
       display_format=facebookAd.getAttribute('display_format')
       ad['display_format']=display_format
 
-      title=facebookAd.getAttribute('title')
-      ad['title']=self.unslash(title)
-
-      ad['body']=facebookAd.getAttribute('body')
-
       ad['page_name']=facebookAd.getAttribute('page_name')
 
       page_profile_picture_url=facebookAd.getAttribute('page_profile_picture_url')
@@ -102,5 +97,23 @@ class FacebookAPI:
       original_image_url=facebookAd.getAttribute('original_image_url')
       if original_image_url:
         ad['original_image_url']=self.unslash(original_image_url)
+      
+      eu_total_reach=ad.get("eu_total_reach",None)
+      if eu_total_reach:
+        ad["ad_spend"]=eu_total_reach*0.3
+      else:
+        ad["ad_spend"]=None
+      
+      link_titles = ad.get("ad_creative_link_titles",None)
+      if link_titles:
+        ad["link_title"]=link_titles[0]
+      else:
+        ad["link_title"]=None
+      
+      link_descriptions = ad.get("ad_creative_link_descriptions",None)
+      if link_descriptions:
+        ad["link_description"]=link_descriptions[0]
+      else:
+        ad["link_description"]=None
 
     return responseData
