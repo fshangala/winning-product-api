@@ -3,6 +3,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 from django.contrib.auth.models import User
+from accounts.serializers import UserSerializer
+from accounts.models import Profile
 
 # Create your views here.
 class AuthToken(ObtainAuthToken):
@@ -29,6 +31,67 @@ class CreatePassword(ViewSet):
           "email is required"
         ]
       },401)
+
+class GoogleLogin(ViewSet):
+  """ 
+  Google login viewset
+  """
+  def create(self,request):
+    # Collect data
+    email=request.data.get("email",None)
+    first_name=request.data.get("first_name",None)
+    last_name=request.data.get("last_name",None)
+    google_id=request.data.get("google_id",None)
+    picture_url=request.data.get("picture_url",None)
+
+    # Generate response
+    response = {
+      "data":{
+        "data":None,
+        "errors":[]
+      },
+      "status":200
+    }
+
+    if email and google_id:
+      try:
+        profile=Profile.objects.get(google_id=google_id)
+      except Profile.DoesNotExist:
+        try:
+          user=User.objects.get(email=email)
+        except User.DoesNotExist:
+          user=User.objects.create(
+            username=email,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+          )
+          user.profile.google_id=google_id
+          user.profile.picture_url=picture_url
+          user.save()
+          userdata=UserSerializer(user)
+
+          response["data"]={"data":userdata.data,"errors":[]}
+          response["status"]=201
+        else:
+          user.profile.google_id=google_id
+          user.profile.picture_url=picture_url
+          user.save()
+          userdata=UserSerializer(user)
+          response["data"]={"data":userdata.data,"errors":[]}
+          response["status"]=200
+      else:
+        profile.google_id=google_id
+        profile.picture_url=picture_url
+        profile.save()
+        userdata=UserSerializer(profile.user)
+        response["data"]={"data":userdata.data,"errors":[]}
+        response["status"]=200
+    else:
+      response["data"]={"data":None,"errors":["Both email and google_id are required"]}
+      response["status"]=400
+  
+    return Response(**response)
 
 class GetOrCreateUserByEmail(ViewSet):
   def list(self,request,*args,**kwargs):

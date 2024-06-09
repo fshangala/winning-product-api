@@ -11,8 +11,12 @@ class FacebookAdsViewset(viewsets.ViewSet):
   def list(self,request):
     facebook = FacebookAPI()
     search_term = request.GET.get("search_term",None)
+    country = request.GET.get("country",None)
     if search_term:
-      response = facebook.getAds(search_term=search_term)
+      if country:
+        response = facebook.getAds(search_term=search_term,country=country)
+      else:
+        response = facebook.getAds(search_term=search_term)
       return Response(response)
     else:
       return Response({
