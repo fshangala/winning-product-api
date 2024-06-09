@@ -74,7 +74,8 @@ class FacebookAPI:
       "ad_reached_countries": [country],
       "search_terms": search_term,
       # "limit": 1,
-      "access_token": token_key
+      "access_token": token_key,
+      "media_type":["IMAGE","VIDEO"]
     }
 
     response = requests.get(self.ads_api_endpoint, params=params)
@@ -100,9 +101,15 @@ class FacebookAPI:
       
       eu_total_reach=ad.get("eu_total_reach",None)
       if eu_total_reach:
-        ad["ad_spend"]=eu_total_reach*0.3
+        ad["ad_spend"]=round(eu_total_reach*0.3,2)
       else:
         ad["ad_spend"]=None
+      
+      ad_spend=ad.get("ad_spend",None)
+      if ad_spend:
+        ad["ad_revenue"]=round(ad_spend*0.69,2)
+      else:
+        ad["ad_revenue"]=None
       
       link_titles = ad.get("ad_creative_link_titles",None)
       if link_titles:
