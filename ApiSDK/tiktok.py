@@ -54,7 +54,7 @@ class TiktokAPI:
         "max_count":12
       },
       params={
-        "fields":"ad.id,ad.first_shown_date,ad.last_shown_date,ad.status,ad.status_statement,ad.videos,ad.image_urls,ad.reach,advertiser.business_id,advertiser.business_name,advertiser.paid_for_by"
+        "fields":"ad.id"
       },
       headers={
         "Content-Type":"application/json",
@@ -62,4 +62,49 @@ class TiktokAPI:
       }
     )
 
-    return response.json()
+    responseData = response.json()
+
+    for ad in responseData['data']['ads']:
+      adResponse = requests.post(
+        f"{self.api_root}/research/adlib/ad/detail/",
+        json={
+          "ad_id":ad['ad']['id']
+        },
+        params={
+          "fields":"ad.id,ad.first_shown_date,ad.last_shown_date,ad.status,ad.status_statement,ad.videos,ad.image_urls,ad.reach,advertiser.business_id,advertiser.business_name,advertiser.paid_for_by,advertiser.follower_count,advertiser.avatar_url,advertiser.profile_url,ad_group.targeting_info"
+        },
+        headers={
+          "Content-Type":"application/json",
+          "Authorization":f"Bearer {self.access_token}"
+        }
+      )
+      adResponseData = adResponse.json()
+      if adResponseData['error']['code'] == 'ok':
+        ad['ad']=adResponseData['data']['ad']
+        ad['advertiser']=adResponseData['data']['advertiser']
+        ad['ad_group']=adResponseData['data']['ad_group']
+      else:
+        print(adResponseData)
+        ad['details']=None
+
+    return responseData
+  
+  def getAd(self,ad_id:int):
+    tokenResponse = self.getAccessToken()
+    if tokenResponse.get("error",None):
+      return tokenResponse
+    adResponse = requests.post(
+      f"{self.api_root}/research/adlib/ad/detail/",
+      json={
+        "ad_id":ad_id
+      },
+      params={
+        "fields":"ad.id,ad.first_shown_date,ad.last_shown_date,ad.status,ad.status_statement,ad.videos,ad.image_urls,ad.reach,advertiser.business_id,advertiser.business_name,advertiser.paid_for_by,advertiser.follower_count,advertiser.avatar_url,advertiser.profile_url,ad_group.targeting_info"
+      },
+      headers={
+        "Content-Type":"application/json",
+        "Authorization":f"Bearer {self.access_token}"
+      }
+    )
+    adResponseData = adResponse.json()
+    return adResponseData

@@ -37,3 +37,8 @@ class TikTokAdsViewset(viewsets.ViewSet):
       return Response({
         "error":"search_term is required!"
       })
+  
+  def retrieve(self,request,pk):
+    tiktok = TiktokAPI()
+    response = tiktok.getAd(pk)
+    return Response(response)
