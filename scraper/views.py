@@ -2,6 +2,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from ApiSDK.tiktok import TiktokAPI
 from ApiSDK.facebook import FacebookAPI
+from ScraperSDK.winninghunt import WinningHunt
 
 # Create your views here.
 class FacebookAdsViewset(viewsets.ViewSet):
@@ -22,6 +23,12 @@ class FacebookAdsViewset(viewsets.ViewSet):
       return Response({
         "error":"search_term is required!"
       })
+
+class MetaAdvertisersViewset(viewsets.ViewSet):
+  def list(self,request):
+    w = WinningHunt()
+    data = w.moveToMetaAdvertisers()
+    return Response(data)
 
 class TikTokAdsViewset(viewsets.ViewSet):
   def __init__(self,*args,**kwargs):
