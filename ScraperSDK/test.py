@@ -1,20 +1,11 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions
+from webdriver_manager.chrome import ChromeDriverManager
 
-from enum import Enum
-from bs4 import BeautifulSoup
-import time
-import os
-from supabase import create_client, Client
-import json
-import queue, threading
-
-class ActiveStatus(Enum):
-  ALL="all"
-  
 class element_exists(object):
   def __init__(self,css_selector:str):
     self.css_selector=css_selector
@@ -29,28 +20,12 @@ class element_exists(object):
 class WinningHunt:
   def __init__(self):
     options = Options()
-    # options.add_argument('--headless')
-    # options.add_argument('--no-sandbox')
+    options.add_argument('--headless')
+    options.add_argument('--no-sandbox')
     # options.add_argument('--disable-dev-shm-usage')
-    # options.add_argument('--disable-gpu')
+    options.add_argument('--disable-gpu')
 
-    self.driver = webdriver.Chrome(options=options)
-
-  def getAdsFromPageSource(self)->list:
-    """
-    Get all the ads from the page source code
-    """
-    soup = BeautifulSoup(self.driver.page_source, 'html.parser')
-    adsContainer = soup.find("div",class_="x1dr75xp xh8yej3 x16md763")
-    
-    trials = 0
-    while adsContainer == None:
-      time.sleep(3)
-      soup = BeautifulSoup(self.driver.page_source, 'html.parser')
-      adsContainer = soup.find("div",class_="x1dr75xp xh8yej3 x16md763")
-
-    ads = list(list(adsContainer.children)[0].children)
-    return ads
+    self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
   
   def fetch(self):
     """
