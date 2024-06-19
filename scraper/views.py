@@ -49,3 +49,20 @@ class TikTokAdsViewset(viewsets.ViewSet):
     tiktok = TiktokAPI()
     response = tiktok.getAd(pk)
     return Response(response)
+
+class MagicAIViewSet(viewsets.ViewSet):
+  def list(self,request):
+    tiktok = TiktokAPI()
+    facebook = FacebookAPI()
+    search_term = request.GET.get("search_term",None)
+    if search_term:
+      tiktokAdsData = tiktok.getAds(search_term=search_term)
+      facebookAdsData = facebook.getAds(search_term=search_term)
+      return Response({
+        "facebok":facebookAdsData,
+        "tiktok":tiktokAdsData
+      })
+    else:
+      return Response({
+        "error":"search_term is required!"
+      })
