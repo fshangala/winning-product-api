@@ -3,6 +3,13 @@ from rest_framework.response import Response
 from ApiSDK.tiktok import TiktokAPI
 from ApiSDK.facebook import FacebookAPI
 from ScraperSDK.winninghunt import WinningHunt
+from django.contrib.auth.models import User
+from scraper.models import (
+  SavedAd
+)
+from scraper.serializers import (
+  SavedAdSerializer
+)
 
 # Create your views here.
 class FacebookAdsViewset(viewsets.ViewSet):
@@ -66,3 +73,24 @@ class MagicAIViewSet(viewsets.ViewSet):
       return Response({
         "error":"search_term is required!"
       })
+
+class SaveAdViewSet(viewsets.ViewSet):
+  def list(self,request):
+    username=request.query_params.get('username')
+    if username:
+      user=User.objects.get(username=username)
+      savedAds = SavedAd.objects.filter(user=user)
+      serializer=SavedAdSerializer(savedAds,many=True)
+      return Response(data=serializer.data)
+    else:
+      return Response({
+        "errors":["username is required"]
+      })
+    
+  def create(self,request):
+    serializer = SavedAdSerializer(data=request.data)
+    if serializer.is_valid():
+      serializer.save()
+      return Response(data=serializer.data,status=201)
+    
+    return Response(data=serializer.errors)

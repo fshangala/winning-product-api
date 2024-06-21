@@ -6,3 +6,4 @@ scraperRouter.register(r'facebook-ads',views.FacebookAdsViewset,basename='facebo
 scraperRouter.register(r'tiktok-ads',views.TikTokAdsViewset,basename='tiktok-ads')
 scraperRouter.register(r'meta-advertisers',views.MetaAdvertisersViewset,basename='meta-advertisers')
 scraperRouter.register(r'magic-ai',views.MagicAIViewSet,basename="magic-ai")
+scraperRouter.register(r'save-ad',views.SaveAdViewSet,basename='save-ad')
