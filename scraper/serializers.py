@@ -4,10 +4,10 @@ from scraper.models import SavedAd
 
 class UserSerializer(serializers.ModelSerializer):
   class Meta:
-    model: User
-    fields: "__all__"
+    model= User
+    fields= "__all__"
 
 class SavedAdSerializer(serializers.ModelSerializer):
   class Meta:
-    model: SavedAd
-    fields: "__all__"
+    model= SavedAd
+    fields= "__all__"

@@ -11,7 +11,7 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
 
 class SavedAd(models.Model):
   user=models.ForeignKey(User,on_delete=models.CASCADE,related_name='saved_ads')
-  source=models.CharField(max_length=200,choices={"facebook":"Facebook","tiktok":"Tiktok"})
+  source=models.CharField(max_length=200,choices=[("facebook","Facebook"),("tiktok","Tiktok")])
   content=models.JSONField()
   
   def __str__(self):
