@@ -2,6 +2,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from ApiSDK.tiktok import TiktokAPI
 from ApiSDK.facebook import FacebookAPI
+from ApiSDK.meta_ad_library import MetaAdLibrary
 from ScraperSDK.winninghunt import WinningHunt
 from django.contrib.auth.models import User
 from scraper.models import (
@@ -33,8 +34,8 @@ class FacebookAdsViewset(viewsets.ViewSet):
 
 class MetaAdvertisersViewset(viewsets.ViewSet):
   def list(self,request):
-    w = WinningHunt()
-    data = w.moveToMetaAdvertisers()
+    adLibrary = MetaAdLibrary()
+    data = adLibrary.getPages()
     return Response(data)
 
 class TikTokAdsViewset(viewsets.ViewSet):
