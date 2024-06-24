@@ -76,16 +76,9 @@ class MagicAIViewSet(viewsets.ViewSet):
 
 class SaveAdViewSet(viewsets.ViewSet):
   def list(self,request):
-    username=request.query_params.get('username')
-    if username:
-      user=User.objects.get(username=username)
-      savedAds = SavedAd.objects.filter(user=user)
-      serializer=SavedAdSerializer(savedAds,many=True)
-      return Response(data=serializer.data)
-    else:
-      return Response({
-        "errors":["username is required"]
-      })
+    savedAds = SavedAd.objects.all()
+    serializer=SavedAdSerializer(savedAds,many=True)
+    return Response(data=serializer.data)
     
   def create(self,request):
     serializer = SavedAdSerializer(data=request.data)
