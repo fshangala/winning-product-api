@@ -35,7 +35,7 @@ class FacebookAdsViewset(viewsets.ViewSet):
 class MetaAdvertisersViewset(viewsets.ViewSet):
   def list(self,request):
     adLibrary = MetaAdLibrary()
-    data = adLibrary.getPages()
+    data = adLibrary.searchPages()
     return Response(data)
 
 class TikTokAdsViewset(viewsets.ViewSet):
