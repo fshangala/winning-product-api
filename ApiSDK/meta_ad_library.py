@@ -1,264 +1,71 @@
 import requests
 from django.conf import settings
+from ApiSDK.meta_ad_library_pages import pagesJson
+from ApiSDK.meta_ad_library_page_details import pageDetailsJson
+from ApiSDK.meta_ad_library_page_ads import pageAdsJson
+import json
 
 class MetaAdLibrary:
   def __init__(self):
     self.baseUrl='https://meta-ad-library.p.rapidapi.com'
-  
-  def getPages(self,query:str="apple"):
-    # url = f"{self.baseUrl}/search/pages"
-
-    # querystring = {"query":query}
-
-    # headers = {
-    #   "x-rapidapi-key": settings.RAPID_API_KEY,
-    #   "x-rapidapi-host": "meta-ad-library.p.rapidapi.com",
-    #   "X-RapidAPI-Mock-Response": "200"
-    # }
-    # print(headers)
-
-    # response = requests.get(url, headers=headers, params=querystring)
-    # responseData = response.json()
-    # return responseData
-
-    responseData = {
-      "query": "apple",
-      "keyword_results": [],
-      "country_code": "ALL",
-      "results": [
-        {
-          "id": "100484820802",
-          "category": "Product/service",
-          "imageURI": "https://scontent.fosu2-2.fna.fbcdn.net/v/t39.30808-1/428679784_783548010485103_8286172572470605016_n.jpg?stp=dst-jpg_p200x200&_nc_cat=1&ccb=1-7&_nc_sid=5f2048&_nc_ohc=vVJfhpXYh58Q7kNvgG2LPcD&_nc_ht=scontent.fosu2-2.fna&oh=00_AYDCNRdBbgu_giLiu68VQUDgsXu8DBivEHCaYbifI1t_nA&oe=667F3F92",
-          "likes": 28642962,
-          "verification": "blue_verified",
-          "name": "Apple TV",
-          "country": None,
-          "entityType": "person_profile",
-          "igUsername": "appletv",
-          "igFollowers": 4104158,
-          "igVerification": True,
-          "pageAlias": "appletv",
-          "pageIsDeleted": False
-        },
-        {
-          "id": "434174436675167",
-          "category": "Product/service",
-          "imageURI": "https://scontent.fosu2-2.fna.fbcdn.net/v/t39.30808-1/387094294_712381880925372_1615700802773976871_n.png?stp=dst-png_p200x200&_nc_cat=1&ccb=1-7&_nc_sid=5f2048&_nc_ohc=LtqScIxt3xcQ7kNvgH5RESp&_nc_ht=scontent.fosu2-2.fna&oh=00_AYBOVVVKHoTF_NQO2vjuJDBBJTkrxZGh3b4SZ_rnJEWTVw&oe=667F163B",
-          "likes": 14369788,
-          "verification": "not_verified",
-          "name": "Apple",
-          "country": None,
-          "entityType": "person_profile",
-          "igUsername": "apple",
-          "igFollowers": 32906041,
-          "igVerification": True,
-          "pageAlias": "apple",
-          "pageIsDeleted": False
-        },
-        {
-          "id": "84917689333",
-          "category": "Restaurant",
-          "imageURI": "https://scontent.fosu2-2.fna.fbcdn.net/v/t39.30808-1/386316026_706370211523996_4097507923650436007_n.jpg?stp=dst-jpg_p200x200&_nc_cat=1&ccb=1-7&_nc_sid=5f2048&_nc_ohc=VvdUo4hkT1kQ7kNvgFDQ9x6&_nc_ht=scontent.fosu2-2.fna&oh=00_AYD1wqCToqczTLjexVvAA1-EKRVs9HhpbLcFC1lT1pdjdg&oe=667F1ED0",
-          "likes": 5827868,
-          "verification": "blue_verified",
-          "name": "Applebee's Grill + Bar",
-          "country": None,
-          "entityType": "person_profile",
-          "igUsername": "applebees",
-          "igFollowers": 622458,
-          "igVerification": True,
-          "pageAlias": "applebees",
-          "pageIsDeleted": False
-        },
-        {
-          "id": "615085188507202",
-          "category": "Product/service",
-          "imageURI": "https://scontent.fosu2-1.fna.fbcdn.net/v/t39.30808-1/240242499_5225107130838295_4785253383888674944_n.jpg?stp=dst-jpg_p200x200&_nc_cat=106&ccb=1-7&_nc_sid=5f2048&_nc_ohc=tDd89Xte33YQ7kNvgH31X0s&_nc_ht=scontent.fosu2-1.fna&oh=00_AYATzmw9VuibYdT2Msse-czwBFDf-v2WQil3qKWDQ4nyfA&oe=667F1938",
-          "likes": 4409824,
-          "verification": "blue_verified",
-          "name": "Apple Music",
-          "country": None,
-          "entityType": "person_profile",
-          "igUsername": "applemusic",
-          "igFollowers": 4944463,
-          "igVerification": True,
-          "pageAlias": "applemusic",
-          "pageIsDeleted": False
-        },
-        {
-          "id": "256468192337",
-          "category": "Musician/band",
-          "imageURI": "https://scontent.fosu2-2.fna.fbcdn.net/v/t1.6435-1/120554707_187347429511305_2427824959662215918_n.jpg?stp=dst-jpg_p200x200&_nc_cat=108&ccb=1-7&_nc_sid=5f2048&_nc_ohc=0OBtD9dn9lUQ7kNvgEiT6-V&_nc_ht=scontent.fosu2-2.fna&oh=00_AYBx1or03v-0maqd7n_-XdolLQc77M1ECj-NO932RTjglg&oe=66A0B3E9",
-          "likes": 37139,
-          "verification": "blue_verified",
-          "name": "The Appleseed Cast",
-          "country": None,
-          "entityType": "person_profile",
-          "igUsername": None,
-          "igFollowers": None,
-          "igVerification": None,
-          "pageAlias": "TheAppleseedCast",
-          "pageIsDeleted": False
-        },
-        {
-          "id": "100606265443281",
-          "category": "Shopping Service",
-          "imageURI": "https://scontent.fosu2-1.fna.fbcdn.net/v/t39.30808-1/351546585_1893392321048186_2254764224717968527_n.png?stp=dst-png_p200x200&_nc_cat=109&ccb=1-7&_nc_sid=5f2048&_nc_ohc=YxxA5Ek6CFcQ7kNvgE2ej7J&_nc_ht=scontent.fosu2-1.fna&oh=00_AYDoGZrGkwUxNyrTu_-RyMPgvEIIAeJX4ZfWt88cdhEN4g&oe=667F2412",
-          "likes": 12732,
-          "verification": "not_verified",
-          "name": "Appledogs",
-          "country": None,
-          "entityType": "person_profile",
-          "igUsername": None,
-          "igFollowers": None,
-          "igVerification": None,
-          "pageAlias": "",
-          "pageIsDeleted": False
-        },
-        {
-          "id": "71529692599",
-          "category": "Mobile Phone Shop",
-          "imageURI": "https://scontent.fosu2-2.fna.fbcdn.net/v/t39.30808-1/326112692_562751909109351_7703679908423433177_n.png?stp=dst-png_p200x200&_nc_cat=101&ccb=1-7&_nc_sid=5f2048&_nc_ohc=8Cqhc0gFN0UQ7kNvgGZ3nv0&_nc_ht=scontent.fosu2-2.fna&oh=00_AYAp8mAK0uGCZ0v5LU9l2fdHgb8Jhse3wtgc6HkY5p8VjQ&oe=667F1ED9",
-          "likes": 152743,
-          "verification": "not_verified",
-          "name": "K-Tuin, tiendas Apple",
-          "country": None,
-          "entityType": "person_profile",
-          "igUsername": "ktuin_apple",
-          "igFollowers": 141848,
-          "igVerification": False,
-          "pageAlias": "ktuin.es",
-          "pageIsDeleted": False
-        },
-        {
-          "id": "158285920894235",
-          "category": "Computer Store",
-          "imageURI": "https://scontent.fosu2-2.fna.fbcdn.net/v/t39.30808-1/325346758_1199734094005507_7046115456378948387_n.png?_nc_cat=1&ccb=1-7&_nc_sid=5f2048&_nc_ohc=zLdhZGgN1dQQ7kNvgHPtzsd&_nc_ht=scontent.fosu2-2.fna&oh=00_AYAV6Urt5_puqXToi008IVt684oWlotNNXCaQh5D1q2wfQ&oe=667F2A77",
-          "likes": 74469,
-          "verification": "not_verified",
-          "name": "iSpot Apple Premium Partner",
-          "country": None,
-          "entityType": "person_profile",
-          "igUsername": "ispotpl",
-          "igFollowers": 32815,
-          "igVerification": False,
-          "pageAlias": "iSpotpl",
-          "pageIsDeleted": False
-        },
-        {
-          "id": "135683599784801",
-          "category": "Electronics",
-          "imageURI": "https://scontent.fosu2-2.fna.fbcdn.net/v/t39.30808-1/355647185_643050507852002_6639952934914348848_n.jpg?stp=dst-jpg_p200x200&_nc_cat=1&ccb=1-7&_nc_sid=5f2048&_nc_ohc=8bvmBwx36_AQ7kNvgENiV9x&_nc_ht=scontent.fosu2-2.fna&oh=00_AYCbHUM8WSd1QaVUfUuZS31rqDSnf58ct-2K3jzYahmfOw&oe=667F3B31",
-          "likes": 82134,
-          "verification": "not_verified",
-          "name": "Amac - Apple begint bij Amac",
-          "country": None,
-          "entityType": "person_profile",
-          "igUsername": "apramac",
-          "igFollowers": 7353,
-          "igVerification": False,
-          "pageAlias": "apramac",
-          "pageIsDeleted": False
-        },
-        {
-          "id": "111971515026975",
-          "category": "Phone/Tablet",
-          "imageURI": "https://scontent.fosu2-2.fna.fbcdn.net/v/t39.30808-1/342439650_1413453946070255_4605103913203059841_n.jpg?stp=dst-jpg_p200x200&_nc_cat=108&ccb=1-7&_nc_sid=5f2048&_nc_ohc=LoZf7QWZncUQ7kNvgHx8cKe&_nc_ht=scontent.fosu2-2.fna&oh=00_AYATOUksdntFayHQq2HJRs8DnFOEX32TvDdiyce_DrkDWg&oe=667F1E48",
-          "likes": 3905,
-          "verification": "not_verified",
-          "name": "TakeApple Estore",
-          "country": None,
-          "entityType": "person_profile",
-          "igUsername": "takeapplestore",
-          "igFollowers": 554,
-          "igVerification": False,
-          "pageAlias": "",
-          "pageIsDeleted": False
-        },
-        {
-          "id": "232633627068",
-          "category": "Media/News Company",
-          "imageURI": "https://scontent.fosu2-1.fna.fbcdn.net/v/t39.30808-1/347811115_964189035030447_7088575326582513018_n.png?stp=dst-png_p200x200&_nc_cat=102&ccb=1-7&_nc_sid=5f2048&_nc_ohc=_XQuS9HONaAQ7kNvgHlW82_&_nc_ht=scontent.fosu2-1.fna&oh=00_AYBtKrF-pD48K6OkNyBj1ZuSsA7-Ln3njKN_wfO_gd0-FA&oe=667F4586",
-          "likes": 3712465,
-          "verification": "blue_verified",
-          "name": "蘋果新聞網",
-          "country": None,
-          "entityType": "person_profile",
-          "igUsername": "appledailytw",
-          "igFollowers": 267446,
-          "igVerification": True,
-          "pageAlias": "appledaily.tw",
-          "pageIsDeleted": False
-        },
-        {
-          "id": "505594929498527",
-          "category": "Computer Store",
-          "imageURI": "https://scontent.fosu2-2.fna.fbcdn.net/v/t39.30808-1/432763382_817328777087137_5190903475553516585_n.jpg?stp=dst-jpg_p200x200&_nc_cat=111&ccb=1-7&_nc_sid=5f2048&_nc_ohc=5N7fW1NPyS4Q7kNvgFssFuh&_nc_ht=scontent.fosu2-2.fna&oh=00_AYB9dEzQAGJgHgLb1DsNaOT59K5elWHNwl-oXDLJOpT76w&oe=667F4D98",
-          "likes": 115955,
-          "verification": "not_verified",
-          "name": "iStores - Apple Premium Partner",
-          "country": None,
-          "entityType": "person_profile",
-          "igUsername": "istores_sk",
-          "igFollowers": 18411,
-          "igVerification": False,
-          "pageAlias": "iStores.sk",
-          "pageIsDeleted": False
-        },
-        {
-          "id": "234738303206924",
-          "category": "Mobile Phone Shop",
-          "imageURI": "https://scontent.fosu2-1.fna.fbcdn.net/v/t39.30808-1/434388290_885554916915549_386611369630204462_n.jpg?stp=dst-jpg_p200x200&_nc_cat=105&ccb=1-7&_nc_sid=5f2048&_nc_ohc=obaIMi51UlEQ7kNvgH87_61&_nc_ht=scontent.fosu2-1.fna&oh=00_AYAAc3jInqU7ej2IAzwkmB3wF_iQpp2lKWW73eBXzl6GeQ&oe=667F42C3",
-          "likes": 5787,
-          "verification": "not_verified",
-          "name": "INTECAT iStore",
-          "country": None,
-          "entityType": "person_profile",
-          "igUsername": "intecat_apple",
-          "igFollowers": 10446,
-          "igVerification": False,
-          "pageAlias": "intecat",
-          "pageIsDeleted": False
-        },
-        {
-          "id": "122087864472691",
-          "category": "Computer Company",
-          "imageURI": "https://scontent.fosu2-1.fna.fbcdn.net/v/t39.30808-1/317729470_6437531552928259_7350069805068654067_n.jpg?stp=dst-jpg_p200x200&_nc_cat=105&ccb=1-7&_nc_sid=5f2048&_nc_ohc=oAwihu5neWAQ7kNvgFdy35V&_nc_ht=scontent.fosu2-1.fna&oh=00_AYCzxHMlDQ9w1sPwiGo94K9HF9ybpH3soTc3zoKv87_f6g&oe=667F35B7",
-          "likes": 82727,
-          "verification": "not_verified",
-          "name": "iSTYLE CZ - Apple Premium Reseller",
-          "country": None,
-          "entityType": "person_profile",
-          "igUsername": "istyle.cz",
-          "igFollowers": 72236,
-          "igVerification": False,
-          "pageAlias": "iSTYLE.cz",
-          "pageIsDeleted": False
-        },
-        {
-          "id": "175775132809720",
-          "category": "Computer Store",
-          "imageURI": "https://scontent.fosu2-1.fna.fbcdn.net/v/t39.30808-1/348241653_246595154625182_7756702561834979798_n.png?_nc_cat=109&ccb=1-7&_nc_sid=5f2048&_nc_ohc=CHFoOKartGwQ7kNvgH6_Xzz&_nc_ht=scontent.fosu2-1.fna&oh=00_AYDQS0bGfaYXnnhs1Ie-AyXZcFB9sNl6F0hMglo0HvoMTA&oe=667F21C2",
-          "likes": 25869,
-          "verification": "not_verified",
-          "name": "IOutlet Recondicionados Apple",
-          "country": None,
-          "entityType": "person_profile",
-          "igUsername": "ioutletstore",
-          "igFollowers": 4259,
-          "igVerification": False,
-          "pageAlias": "ioutletstore.pt",
-          "pageIsDeleted": False
-        }
-      ]
+    self.headers={
+      "x-rapidapi-key": settings.RAPID_API_KEY,
+      "x-rapidapi-host": "meta-ad-library.p.rapidapi.com"
     }
+
+  def searchAds(self):
+    pass
+
+  def searchPages(self,query="apple"):
+    queryParams={
+      "query":query
+    }
+    url=f"{self.baseUrl}/search/pages"
+    # response=requests.get(
+    #   url=url,
+    #   params=queryParams,
+    #   headers=self.headers
+    # )
+    # responseData=response.json()
+    responseData=json.loads(pagesJson)
+
     for page in responseData["results"]:
-      ads = self.getPageAds(page["id"])
-      page["ads"]=ads
+      page["details"]=self.pageDetails(page_id=page["id"])
+      page["ads"]=self.pageAds(page_id=page["id"])
+    return responseData
+
+  def pageDetails(self,page_id):
+    queryParams={
+      "page_id":page_id
+    }
+    url=f"{self.baseUrl}/page/details"
+    # response=requests.get(
+    #   url=url,
+    #   params=queryParams,
+    #   headers=self.headers
+    # )
+    # responseData=response.json()
+    responseData=json.loads(pageDetailsJson)
+    return responseData
+
+  def pageAds(self,page_id,country_code='US',platform='facebook,instagram',media_types='all',active_status='all'):
+    queryParams={
+      "page_id":page_id,
+      "country_code":country_code,
+      "platform":platform,
+      "media_types":media_types,
+      "active_status":active_status
+    }
+    url=f"{self.baseUrl}/page/ads"
+    # response=requests.get(
+    #   url=url,
+    #   params=queryParams,
+    #   headers=self.headers
+    # )
+    # responseData=response.json()
+    responseData=json.loads(pageAdsJson)
     return responseData
   
-  def getPageAds(self,page_id):
     # url = f"{self.baseUrl}/page/ads"
     # querystring = {
     #   "page_id":f"{page_id}",
