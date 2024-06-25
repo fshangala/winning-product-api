@@ -2,7 +2,7 @@ import requests
 from django.conf import settings
 from ApiSDK.meta_ad_library_pages import pagesJson
 from ApiSDK.meta_ad_library_page_details import pageDetailsJson
-from ApiSDK.meta_ad_library_page_ads import pageAdsJson
+from ApiSDK.meta_ad_library_page_ads import getPageAdsDict
 import json
 
 class MetaAdLibrary:
@@ -63,7 +63,7 @@ class MetaAdLibrary:
     #   headers=self.headers
     # )
     # responseData=response.json()
-    responseData=json.loads(pageAdsJson)
+    responseData=getPageAdsDict()
     return responseData
   
     # url = f"{self.baseUrl}/page/ads"

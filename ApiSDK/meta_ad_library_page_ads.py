@@ -1,3 +1,6 @@
+import random
+import json
+
 pageAdsJson="""
 {
   "page_id": "434174436675167",
@@ -3843,3 +3846,9 @@ pageAdsJson="""
   ]
 }
 """
+
+def getPageAdsDict()->dict:
+  pageAdsDict = json.loads(pageAdsJson)
+  pageAdsDict["number_of_ads"] = random.randint(1,99)
+  pageAdsDict["results"] = pageAdsDict["results"][:random.randint(1,11)]
+  return pageAdsDict
