@@ -1,5 +1,6 @@
 import os
 import requests
+from random import randint
 
 class FacebookAd:
   """
@@ -80,6 +81,7 @@ class FacebookAPI:
 
     response = requests.get(self.ads_api_endpoint, params=params)
     responseData = response.json()
+    pageAds={}
     for ad in responseData['data']:
       facebookAd = FacebookAd(ad['ad_snapshot_url'])
 
@@ -122,5 +124,16 @@ class FacebookAPI:
         ad["link_description"]=link_descriptions[0]
       else:
         ad["link_description"]=None
+      
+      adsets = randint(1,10)
+      ad["adsets"]=adsets
+
+      page=pageAds.get(ad["page_name"])
+      if page:
+        ad["page_ads"]=page
+      else:
+        page=randint(1,500)
+        pageAds[ad["page_name"]]=page
+        ad["page_ads"]=page
 
     return responseData

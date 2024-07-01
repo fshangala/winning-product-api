@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'scraper',
     'accounts',
     'sales_tracker',
+    'facebook_ads',
 
     'django.contrib.admin',
     'django.contrib.auth',
