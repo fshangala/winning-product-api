@@ -3,17 +3,6 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions
-
-from enum import Enum
-from bs4 import BeautifulSoup
-import time
-import os
-from supabase import create_client, Client
-import json
-import queue, threading
-
-class ActiveStatus(Enum):
-  ALL="all"
   
 class element_exists(object):
   def __init__(self,css_selector:str):
@@ -35,22 +24,6 @@ class WinningHunt:
     # options.add_argument('--disable-gpu')
 
     self.driver = webdriver.Chrome(options=options)
-
-  def getAdsFromPageSource(self)->list:
-    """
-    Get all the ads from the page source code
-    """
-    soup = BeautifulSoup(self.driver.page_source, 'html.parser')
-    adsContainer = soup.find("div",class_="x1dr75xp xh8yej3 x16md763")
-    
-    trials = 0
-    while adsContainer == None:
-      time.sleep(3)
-      soup = BeautifulSoup(self.driver.page_source, 'html.parser')
-      adsContainer = soup.find("div",class_="x1dr75xp xh8yej3 x16md763")
-
-    ads = list(list(adsContainer.children)[0].children)
-    return ads
   
   def fetch(self):
     """
@@ -75,12 +48,36 @@ class WinningHunt:
       data = self.moveToMetaAdvertisers()
     elif "Pages" in self.driver.title:
       WebDriverWait(self.driver,20).until(element_exists("#store-table .dt-center a"))
-      data = self.driver.execute_script("var table = document.querySelector(\"#store-table\");var data=[];for(var i=1;i<table.rows.length;i++){var row={};for(var j=0;j<table.rows[i].cells.length;j++){row[table.rows[0].cells[j].innerText]=table.rows[i].cells[j].innerText;data.push(row);}};return data;")
+      data = self.driver.execute_script("""
+      var table = document.querySelector("#store-table");
+      var data=[];
+      for(var i=1;i<table.rows.length;i++){
+        var row={
+          "page":{
+            "url":table.rows[i].cells[0].querySelector("a").getAttribute("href"),
+            "picture_url":table.rows[i].cells[0].querySelector("a img").getAttribute("src"),
+            "name":table.rows[i].cells[0].querySelector("a div").innerText
+          },
+          "countries":Array.from(table.rows[i].cells[1].querySelectorAll("img")).map((value)=>value.getAttribute("src")),
+          "website":Array.from(table.rows[i].cells[2].querySelectorAll("img")).map((value)=>value.getAttribute("src")),
+          "ads":table.rows[i].cells[3].innerText,
+          "adsets":table.rows[i].cells[4].innerText,
+          "avgAdsets":table.rows[i].cells[5].innerText,
+          "likes":table.rows[i].cells[6].innerText,
+          "followers":table.rows[i].cells[7].innerText,
+          "created":table.rows[i].cells[8].innerText
+        };
+        data.push(row);
+      };
+      return data;
+      """)
       
     return data
     
-w = WinningHunt()
-data = w.moveToMetaAdvertisers()
-print(data)
-print(type(data))
-print(dir(data))
+# w = WinningHunt()
+# data = w.moveToMetaAdvertisers()
+# print(data)
+# print(type(data))
+# print(dir(data))
+# while True:
+#   pass
