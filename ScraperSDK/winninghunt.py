@@ -48,28 +48,12 @@ class WinningHunt:
       data = self.moveToMetaAdvertisers()
     elif "Pages" in self.driver.title:
       WebDriverWait(self.driver,20).until(element_exists("#store-table .dt-center a"))
-      data = self.driver.execute_script("""
-      var table = document.querySelector("#store-table");
-      var data=[];
-      for(var i=1;i<table.rows.length;i++){
-        var row={
-          "page":{
-            "url":table.rows[i].cells[0].querySelector("a").getAttribute("href"),
-            "picture_url":table.rows[i].cells[0].querySelector("a img").getAttribute("src"),
-            "name":table.rows[i].cells[0].querySelector("a div").innerText
-          },
-          "countries":Array.from(table.rows[i].cells[1].querySelectorAll("img")).map((value)=>value.getAttribute("src")),
-          "website":Array.from(table.rows[i].cells[2].querySelectorAll("img")).map((value)=>value.getAttribute("src")),
-          "ads":table.rows[i].cells[3].innerText,
-          "adsets":table.rows[i].cells[4].innerText,
-          "avgAdsets":table.rows[i].cells[5].innerText,
-          "likes":table.rows[i].cells[6].innerText,
-          "followers":table.rows[i].cells[7].innerText,
-          "created":table.rows[i].cells[8].innerText
-        };
-        data.push(row);
-      };
-      return data;
-      """)
+      data = self.driver.execute_script("var table = document.querySelector(\"#store-table\");var data=[];for(var i=1;i<table.rows.length;i++){var row={};for(var j=0;j<table.rows[i].cells.length;j++){row[table.rows[0].cells[j].innerText]=table.rows[i].cells[j].innerText;data.push(row);}};return data;")
       
     return data
+    
+# w = WinningHunt()
+# data = w.moveToMetaAdvertisers()
+# print(data)
+# print(type(data))
+# print(dir(data))

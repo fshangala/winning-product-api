@@ -1,2 +1,0 @@
-url="https://education.apple.com/forum/teaching-and-learning?cid=eduent-us-soc-apedu-nyni-socl-rbwim-staf-caro-cpc-ios-mul-aiost-bhv-tchr-edulp-ufnnl-usen-frm2srs-static-11ar-ban-educm-na-na-na-na-na-igcar1-04063209"
-print(url.split("/")[2])

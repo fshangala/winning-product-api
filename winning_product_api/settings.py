@@ -43,10 +43,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
-    'drf_spectacular',
     'scraper',
     'accounts',
-    'sales_tracker',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -145,20 +143,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
-    ],
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-}
-SPECTACULAR_SETTINGS = {
-    'TITLE': 'COPIWIN',
-    'DESCRIPTION': 'Winning Product Hunt',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': True,
-    # OTHER SETTINGS
+    ]
 }
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = False
-
-FACEBOOK_ACCESS_KEY=env("FACEBOOK_ACCESS_KEY")
-RAPID_API_KEY=env("RAPID_API_KEY")

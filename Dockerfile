@@ -1,7 +1,5 @@
 # syntax=docker/dockerfile:1
 FROM python:3.9
-RUN apt update
-RUN apt install chromium -y
 WORKDIR /code/
 COPY . /code/
 RUN pip install --upgrade pip
