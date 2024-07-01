@@ -22,11 +22,13 @@ from scraper.urls import scraperRouter
 from accounts.urls import accountsRouter
 from sales_tracker.urls import salesTrackerRouter
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+from facebook_ads.urls import facebookAdsRouter
 
 router = routers.DefaultRouter()
 router.registry.extend(scraperRouter.registry)
 router.registry.extend(accountsRouter.registry)
 router.registry.extend(salesTrackerRouter.registry)
+router.registry.extend(facebookAdsRouter.registry)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
