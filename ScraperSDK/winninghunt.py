@@ -117,6 +117,4 @@ class WinningHunt:
       """)
     
     return data
-
-w=WinningHunt()
-print(w.addTrackingSite("https://ohsnap.com/"))
+  
