@@ -73,3 +73,50 @@ class WinningHunt:
       """)
       
     return data
+  
+  def addTrackingSite(self,url:str):
+    self.driver.get("https://app.winninghunter.com/sales-tracker")
+    data=None
+    if "Login" in self.driver.title:
+      self.login()
+      WebDriverWait(self.driver,10).until(expected_conditions.title_contains("Dashboard"))
+      data = self.addTrackingSite(url)
+    elif "Sales" in self.driver.title:
+      email = self.driver.find_element(By.ID, "Store-URL")
+      email.send_keys(url)
+      startButton=self.driver.find_element(By.CSS_SELECTOR,"button[type='submit']")
+      startButton.click()
+      WebDriverWait(self.driver,10).until(expected_conditions.title_contains("Details"))
+      data = self.getTrackingSites()
+    
+    return data
+  
+  def getTrackingSites(self):
+    self.driver.get("https://app.winninghunter.com/sales-tracker")
+    data=None
+    if "Login" in self.driver.title:
+      self.login()
+      WebDriverWait(self.driver,10).until(expected_conditions.title_contains("Dashboard"))
+      data = self.getTrackingSites()
+    elif "Sales" in self.driver.title:
+      WebDriverWait(self.driver,10).until(element_exists("#store-table"))
+      data = self.driver.execute_script("""
+      var table = document.querySelector("#store-table");
+      var data=[];
+      for(var i=1;i<table.rows.length;i++){
+        var row={
+          "store":table.rows[i].cells[0].innerText,
+          "today":table.rows[i].cells[1].innerText,
+          "yesterday":table.rows[i].cells[2].innerText,
+          "7days":table.rows[i].cells[3].innerText,
+          "30days":table.rows[i].cells[4].innerText
+        };
+        data.push(row);
+      };
+      return data;
+      """)
+    
+    return data
+
+w=WinningHunt()
+print(w.addTrackingSite("https://ohsnap.com/"))

@@ -40,3 +40,6 @@ class StoreAddSerializer(serializers.Serializer):
   def create(self, validated_data):
     store=Store.objects.create(**validated_data)
     return store
+
+class AddTrackingSiteSerializer(serializers.Serializer):
+  store_url=serializers.URLField()
