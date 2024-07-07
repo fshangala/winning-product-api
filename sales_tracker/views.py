@@ -4,6 +4,7 @@ from sales_tracker.models import Store
 from sales_tracker.serializers import StoreSerializer, StoreAddSerializer, AddTrackingSiteSerializer
 from drf_spectacular.utils import extend_schema
 from ScraperSDK.winninghunt import WinningHunt
+from ApiSDK.sales_tracker import SalesTracker
 
 # Create your views here.
 class StoreViewSet(ViewSet):
@@ -11,8 +12,16 @@ class StoreViewSet(ViewSet):
 
   def list(self,request):
     stores=Store.objects.all()
-    serializer=self.serializer_class(instance=stores,many=True)
-    return Response(serializer.data)
+    w=WinningHunt()
+    data=w.getTrackingSites()
+    filteredSites=[]
+    for store in stores:
+      s=SalesTracker()
+      shop=s.getStoreData(storeUrl=store.url)
+      name = shop.hostname.split(".")[1] if shop.hostname.split(".")[0] == "www" else shop.hostname.split(".")[0]
+      fd=filter(lambda x: name in x["store"],data)
+      filteredSites.extend(fd)
+    return Response(filteredSites)
   
   @extend_schema(
     request=StoreAddSerializer,
@@ -25,21 +34,3 @@ class StoreViewSet(ViewSet):
       return Response(StoreSerializer(instance=store).data)
     else:
       return Response(serializer.errors)
-
-class TrackingStoreViewSet(ViewSet):
-  serializer_class=AddTrackingSiteSerializer
-  
-  def list(self,request):
-    winningHunt=WinningHunt()
-    data = winningHunt.getTrackingSites()
-    return Response(data)
-  
-  def create(self,request):
-    serializer=AddTrackingSiteSerializer(data=request.data)
-    if serializer.is_valid():
-      winningHunt=WinningHunt()
-      data = winningHunt.addTrackingSite(url=serializer.validated_data["store_url"])
-      return Response(data)
-    else:
-      return Response(serializer.errors)
-      

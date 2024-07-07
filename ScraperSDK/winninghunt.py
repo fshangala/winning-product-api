@@ -3,6 +3,14 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions
+
+class TimeoutError(Exception):
+  def __init__(self, message:str, *args: object) -> None:
+    super().__init__(*args)
+    self.message=message
+    
+  def __str__(self) -> str:
+    return self.message
   
 class element_exists(object):
   def __init__(self,css_selector:str):
@@ -79,14 +87,20 @@ class WinningHunt:
     data=None
     if "Login" in self.driver.title:
       self.login()
-      WebDriverWait(self.driver,10).until(expected_conditions.title_contains("Dashboard"))
+      try:
+        WebDriverWait(self.driver,10).until(expected_conditions.title_contains("Dashboard"))
+      except Exception as e:
+        raise TimeoutError(message="Did not go to dashboard after login")
       data = self.addTrackingSite(url)
     elif "Sales" in self.driver.title:
       email = self.driver.find_element(By.ID, "Store-URL")
       email.send_keys(url)
       startButton=self.driver.find_element(By.CSS_SELECTOR,"button[type='submit']")
       startButton.click()
-      WebDriverWait(self.driver,10).until(expected_conditions.title_contains("Details"))
+      try:
+        WebDriverWait(self.driver,10).until(expected_conditions.title_contains("Details"))
+      except Exception as e:
+        raise TimeoutError(message="Did not go to details page after adding site")
       data = self.getTrackingSites()
     
     return data
@@ -96,10 +110,16 @@ class WinningHunt:
     data=None
     if "Login" in self.driver.title:
       self.login()
-      WebDriverWait(self.driver,10).until(expected_conditions.title_contains("Dashboard"))
+      try:
+        WebDriverWait(self.driver,10).until(expected_conditions.title_contains("Dashboard"))
+      except Exception as e:
+        raise TimeoutError(message="Did not go to dashboard after login")
       data = self.getTrackingSites()
     elif "Sales" in self.driver.title:
-      WebDriverWait(self.driver,10).until(element_exists("#store-table"))
+      try:
+        WebDriverWait(self.driver,10).until(element_exists("#store-table"))
+      except Exception as e:
+        raise TimeoutError(message="Did not find store-table")
       data = self.driver.execute_script("""
       var table = document.querySelector("#store-table");
       var data=[];

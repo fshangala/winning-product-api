@@ -3,11 +3,9 @@ from sales_tracker.models import Store
 from ApiSDK.sales_tracker import SalesTracker
 
 class StoreSerializer(serializers.Serializer):
-  name=serializers.CharField(required=True)
+  title=serializers.CharField(required=True)
   url=serializers.URLField(required=True)
-  title=serializers.CharField()
-  store_type=serializers.CharField()
-  description=serializers.CharField()
+  hostname=serializers.CharField()
 
   def create(self, validated_data):
     store=Store.objects.create(**validated_data)
@@ -25,11 +23,9 @@ class StoreAddSerializer(serializers.Serializer):
       raise serializers.ValidationError(str(e))
     else:
       serializer=StoreSerializer(data={
-        "name":shopifyStore.name,
-        "url":shopifyStore.url.geturl(),
         "title":shopifyStore.title,
-        "store_type":shopifyStore.store_type,
-        "description":shopifyStore.description,
+        "url":shopifyStore.url,
+        "hostname":shopifyStore.hostname
       })
       print(shopifyStore.__dict__)
       if serializer.is_valid():

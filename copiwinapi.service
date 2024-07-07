@@ -1,0 +1,12 @@
+[Unit]
+Description=Copiwin API Server
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/data/winning-product-api/venv/bin/python3 /data/winning-product-api/manage.py runserver 0.0.0.0:8001
+User=root
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
