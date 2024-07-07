@@ -10,4 +10,5 @@ accountsRouter.register(r'accounts/google-login',viewset=views.GoogleLogin,basen
 app_name="accounts"
 urlpatterns = [
   path('api-token-auth/', views.AuthToken.as_view()),
+  path('oauth-token/',view=views.OAuthTokenView.as_view())
 ]

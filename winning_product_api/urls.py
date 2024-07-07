@@ -23,6 +23,7 @@ from accounts.urls import accountsRouter
 from sales_tracker.urls import salesTrackerRouter
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from facebook_ads.urls import facebookAdsRouter
+from oauth2_provider import urls as oauth2_urls
 
 router = routers.DefaultRouter()
 router.registry.extend(scraperRouter.registry)
@@ -37,9 +38,7 @@ urlpatterns = [
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     path('', include(router.urls)),
     path('accounts/',include('accounts.urls', namespace='accounts')),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
-]
-
-urlpatterns += [
-    path('api-token-auth/', views.obtain_auth_token)
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('o/', include(oauth2_urls)),
+    path('api-token-auth/', views.obtain_auth_token),
 ]
