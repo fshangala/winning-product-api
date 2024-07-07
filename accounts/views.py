@@ -5,8 +5,40 @@ from rest_framework.viewsets import ViewSet
 from django.contrib.auth.models import User
 from accounts.serializers import UserSerializer
 from accounts.models import Profile
+from oauth2_provider.views import TokenView
+from rest_framework.views import APIView
+from drf_spectacular.utils import extend_schema, inline_serializer
+from rest_framework import serializers
 
 # Create your views here.
+class OAuthTokenView(TokenView,APIView):
+  @extend_schema(
+    request=inline_serializer(
+      name="InlineTokenSerializer",
+      fields={
+        "client_id":serializers.CharField(),
+        "client_secret":serializers.CharField(),
+        "grant_type":serializers.ChoiceField(choices=(('password','password'),('client_credentials','client_credentials'))),
+        "username":serializers.CharField(required=True),
+        "password":serializers.CharField(required=True)
+      }
+    ),
+    responses={
+      200:inline_serializer(
+        name="InlineTokenResponse",
+        fields={
+          "access_token":serializers.CharField(),
+          "expires_in":serializers.IntegerField(),
+          "token_type":serializers.CharField(),
+          "scope":serializers.CharField(),
+          "refresh_token":serializers.CharField()
+        }
+      )
+    }
+  )
+  def post(self,request,*args,**kwargs):
+    return super().post(request,*args,**kwargs)
+  
 class AuthToken(ObtainAuthToken):
   def post(self,request,*args,**kwargs):
     print(request.data)
