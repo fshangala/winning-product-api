@@ -2,20 +2,38 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from accounts.models import Profile
 import requests
-from oauth2_provider.models import Application, AccessToken, RefreshToken
-from django.utils import timezone
-from oauthlib import common
+from oauth2_provider.models import Application
 
-class ProfileSerializer(serializers.ModelSerializer):
-  class Meta:
-    model= Profile
-    fields= "__all__"
+class ProfileSerializer(serializers.Serializer):
+  user=serializers.PrimaryKeyRelatedField(read_only=True)
+  google_id=serializers.CharField(required=False)
+  profile_url=serializers.URLField(required=False)
 
-class UserSerializer(serializers.ModelSerializer):
-  profile=ProfileSerializer(many=False)
-  class Meta:
-    model= User
-    fields= ("id","profile","last_login","is_superuser","username","first_name","last_name","email","is_staff","is_active","date_joined")
+class UserSerializer(serializers.Serializer):
+  id=serializers.IntegerField(read_only=True)
+  username=serializers.CharField(required=True)
+  email=serializers.EmailField(required=True)
+  first_name=serializers.CharField()
+  last_name=serializers.CharField()
+  profile=ProfileSerializer(many=False,required=False)
+  password=serializers.CharField(write_only=True,required=True)
+  is_superuser=serializers.BooleanField(read_only=True)
+  is_staff=serializers.BooleanField(read_only=True)
+  is_active=serializers.BooleanField(read_only=True)
+  last_login=serializers.DateTimeField(read_only=True)
+  date_joined=serializers.DateTimeField(read_only=True)
+  
+  def create(self, validated_data:dict):
+    profile_data=validated_data.pop("profile",None)
+    password=validated_data.pop("password")
+    user=User.objects.create(**validated_data)
+    user.set_password(password)
+    user.save()
+    if profile_data:
+      user.profile.google_id=profile_data.get("google_id",None)
+      user.profile.profile_url=profile_data.get("profile_url",None)
+      user.save()
+    return user
 
 class GoogleLoginSerializer(serializers.Serializer):
   client_id=serializers.CharField(required=True)

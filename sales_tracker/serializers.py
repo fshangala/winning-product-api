@@ -2,8 +2,10 @@ from rest_framework import serializers
 from sales_tracker.models import Store
 from ApiSDK.sales_tracker import SalesTracker
 from ScraperSDK.winninghunt import WinningHunt
+from django.contrib.auth.models import User
 
 class StoreSerializer(serializers.Serializer):
+  user=serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
   title=serializers.CharField(required=True)
   url=serializers.URLField(required=True)
   hostname=serializers.CharField()
@@ -14,6 +16,10 @@ class StoreSerializer(serializers.Serializer):
 
 class StoreAddSerializer(serializers.Serializer):
   url=serializers.CharField()
+  
+  def __init__(self, user:User, instance=None, data=..., **kwargs):
+    super().__init__(instance, data, **kwargs)
+    self.user=user
 
   def validate(self, attrs):
     data=attrs
@@ -24,6 +30,7 @@ class StoreAddSerializer(serializers.Serializer):
       raise serializers.ValidationError(str(e))
     else:
       serializer=StoreSerializer(data={
+        "user":self.user.id,
         "title":shopifyStore.title,
         "url":shopifyStore.url,
         "hostname":shopifyStore.hostname
@@ -32,7 +39,7 @@ class StoreAddSerializer(serializers.Serializer):
         data=serializer.validated_data
 
     try:
-      store=Store.objects.get(url=data["url"])
+      store=self.user.stores.get(url=data["url"])
     except Store.DoesNotExist:
       store=None
     
@@ -46,7 +53,7 @@ class StoreAddSerializer(serializers.Serializer):
     data = w.addTrackingSite(validated_data["url"])
     
     store=Store.objects.create(**validated_data)
-    userStores=Store.objects.all()
+    userStores=self.user.stores.all()
     
     name = store.hostname.split(".")[1] if store.hostname.split(".")[0] == "www" else store.hostname.split(".")[0]
     addedSites=filter(lambda x: name in x["store"],data)
@@ -60,5 +67,5 @@ class StoreAddSerializer(serializers.Serializer):
     return filteredSites, addedSites, store
 
 class AddTrackingSiteSerializer(serializers.Serializer):
-  store_url=serializers.URLField()
+  url=serializers.URLField()
   

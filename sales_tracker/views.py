@@ -1,8 +1,9 @@
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
+from rest_framework import serializers
 from sales_tracker.models import Store
 from sales_tracker.serializers import StoreSerializer, StoreAddSerializer, AddTrackingSiteSerializer
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, inline_serializer
 from ScraperSDK.winninghunt import WinningHunt
 from ApiSDK.sales_tracker import SalesTracker
 
@@ -22,11 +23,40 @@ class StoreViewSet(ViewSet):
     return Response(filteredSites)
   
   @extend_schema(
-    request=StoreAddSerializer,
-    responses=StoreSerializer
+    request=AddTrackingSiteSerializer,
+    responses={
+      200: inline_serializer(
+        name="InlineAddStoreSerializer",
+        fields={
+          "data":inline_serializer(
+            name="InlineTrackedSiteSerializer",
+            fields={
+              "store":serializers.CharField(),
+              "today":serializers.CharField(),
+              "yesterday":serializers.CharField(),
+              "7days":serializers.CharField(),
+              "30days":serializers.CharField(),
+            },
+            many=True,
+          ),
+          "filtered":inline_serializer(
+            name="InlineTrackedSiteSerializer",
+            fields={
+              "store":serializers.CharField(),
+              "today":serializers.CharField(),
+              "yesterday":serializers.CharField(),
+              "7days":serializers.CharField(),
+              "30days":serializers.CharField(),
+            },
+            many=True,
+          ),
+          "store":StoreSerializer()
+        }
+      )
+    }
   )
   def create(self,request):
-    serializer=StoreAddSerializer(data=request.data)
+    serializer=StoreAddSerializer(user=request.user,data=request.data)
     if serializer.is_valid():
       data, filtered, store = serializer.save()
       return Response({
