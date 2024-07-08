@@ -15,9 +15,7 @@ class StoreViewSet(ViewSet):
     w=WinningHunt()
     data=w.getTrackingSites()
     filteredSites=[]
-    for store in stores:
-      s=SalesTracker()
-      shop=s.getStoreData(storeUrl=store.url)
+    for shop in stores:
       name = shop.hostname.split(".")[1] if shop.hostname.split(".")[0] == "www" else shop.hostname.split(".")[0]
       fd=filter(lambda x: name in x["store"],data)
       filteredSites.extend(fd)
@@ -30,7 +28,11 @@ class StoreViewSet(ViewSet):
   def create(self,request):
     serializer=StoreAddSerializer(data=request.data)
     if serializer.is_valid():
-      store = serializer.save()
-      return Response(StoreSerializer(instance=store).data)
+      data, filtered, store = serializer.save()
+      return Response({
+        "data":data,
+        "filtered":filtered,
+        "store":StoreSerializer(instance=store).data
+      })
     else:
       return Response(serializer.errors)

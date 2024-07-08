@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from sales_tracker.models import Store
 from ApiSDK.sales_tracker import SalesTracker
+from ScraperSDK.winninghunt import WinningHunt
 
 class StoreSerializer(serializers.Serializer):
   title=serializers.CharField(required=True)
@@ -12,7 +13,7 @@ class StoreSerializer(serializers.Serializer):
     return store
 
 class StoreAddSerializer(serializers.Serializer):
-  url=serializers.URLField()
+  url=serializers.CharField()
 
   def validate(self, attrs):
     data=attrs
@@ -27,15 +28,37 @@ class StoreAddSerializer(serializers.Serializer):
         "url":shopifyStore.url,
         "hostname":shopifyStore.hostname
       })
-      print(shopifyStore.__dict__)
       if serializer.is_valid():
-        data=serializer.data
+        data=serializer.validated_data
 
+    try:
+      store=Store.objects.get(url=data["url"])
+    except Store.DoesNotExist:
+      store=None
+    
+    if store:
+      raise serializers.ValidationError(f"The store {data['url']} is already being tracked")
+      
     return data
 
   def create(self, validated_data):
+    w=WinningHunt()
+    data = w.addTrackingSite(validated_data["url"])
+    
     store=Store.objects.create(**validated_data)
-    return store
+    userStores=Store.objects.all()
+    
+    name = store.hostname.split(".")[1] if store.hostname.split(".")[0] == "www" else store.hostname.split(".")[0]
+    addedSites=filter(lambda x: name in x["store"],data)
+    
+    filteredSites=[]
+    for shop in userStores:
+      name = shop.hostname.split(".")[1] if shop.hostname.split(".")[0] == "www" else shop.hostname.split(".")[0]
+      fd=filter(lambda x: name in x["store"],data)
+      filteredSites.extend(fd)
+      
+    return filteredSites, addedSites, store
 
 class AddTrackingSiteSerializer(serializers.Serializer):
   store_url=serializers.URLField()
+  

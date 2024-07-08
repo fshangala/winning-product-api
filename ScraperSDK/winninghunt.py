@@ -100,7 +100,7 @@ class WinningHunt:
       try:
         WebDriverWait(self.driver,10).until(expected_conditions.title_contains("Details"))
       except Exception as e:
-        raise TimeoutError(message="Did not go to details page after adding site")
+        pass
       data = self.getTrackingSites()
     
     return data

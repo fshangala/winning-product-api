@@ -150,6 +150,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 OAUTH2_PROVIDER = {
+    'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore',
     'SCOPES': {'read': 'Read scope', 'write': 'Write scope', 'groups': 'Access to your groups'}
 }
 
@@ -163,7 +164,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
@@ -181,7 +182,15 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = False
 
-CSRF_TRUSTED_ORIGINS = ['https://api.copiwin.com','http://api.copiwin.com']
+CSRF_TRUSTED_ORIGINS = [
+    'https://api.copiwin.com',
+    'http://api.copiwin.com',
+    'https://dashboard.copiwin.com',
+    'http://dashboard.copiwin.com',
+    'http://localhost:5173',
+    'http://copiwin.com',
+    'https://copiwin.com',
+]
 
 FACEBOOK_ACCESS_KEY=env("FACEBOOK_ACCESS_KEY")
 RAPID_API_KEY=env("RAPID_API_KEY")
