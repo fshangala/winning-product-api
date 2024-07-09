@@ -10,3 +10,11 @@ class Store(models.Model):
 
   def __str__(self) -> str:
     return self.title
+
+class TrackData(models.Model):
+  store=models.OneToOneField(to=Store,on_delete=models.CASCADE,related_name="track_data")
+  data=models.JSONField()
+  
+  def __str__(self):
+      return self.store.hostname
+  

@@ -1,14 +1,23 @@
 from rest_framework import serializers
-from sales_tracker.models import Store
+from sales_tracker.models import Store, TrackData
 from ApiSDK.sales_tracker import SalesTracker
 from ScraperSDK.winninghunt import WinningHunt
 from django.contrib.auth.models import User
+
+class TrackDataSerializer(serializers.Serializer):
+  store=serializers.PrimaryKeyRelatedField(queryset=Store.objects.all())
+  data=serializers.JSONField()
+  
+  def create(self, validated_data):
+    trackData=TrackData.objects.create(**validated_data)
+    return trackData
 
 class StoreSerializer(serializers.Serializer):
   user=serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
   title=serializers.CharField(required=True)
   url=serializers.URLField(required=True)
   hostname=serializers.CharField()
+  track_data=TrackDataSerializer(many=False,read_only=True)
 
   def create(self, validated_data):
     store=Store.objects.create(**validated_data)
@@ -27,7 +36,7 @@ class StoreAddSerializer(serializers.Serializer):
     try:
       shopifyStore = sales_tracker.getStoreData(storeUrl=attrs["url"])
     except Exception as e:
-      raise serializers.ValidationError(str(e))
+      raise serializers.ValidationError(f"Invalid store, please make sure the provided url is of a shopify store: {str(e)}")
     else:
       serializer=StoreSerializer(data={
         "user":self.user.id,
@@ -48,23 +57,9 @@ class StoreAddSerializer(serializers.Serializer):
       
     return data
 
-  def create(self, validated_data):
-    w=WinningHunt()
-    data = w.addTrackingSite(validated_data["url"])
-    
-    store=Store.objects.create(**validated_data)
-    userStores=self.user.stores.all()
-    
-    name = store.hostname.split(".")[1] if store.hostname.split(".")[0] == "www" else store.hostname.split(".")[0]
-    addedSites=filter(lambda x: name in x["store"],data)
-    
-    filteredSites=[]
-    for shop in userStores:
-      name = shop.hostname.split(".")[1] if shop.hostname.split(".")[0] == "www" else shop.hostname.split(".")[0]
-      fd=filter(lambda x: name in x["store"],data)
-      filteredSites.extend(fd)
-      
-    return filteredSites, addedSites, store
+  def create(self, validated_data):    
+    store=Store.objects.create(**validated_data)      
+    return store
 
 class AddTrackingSiteSerializer(serializers.Serializer):
   url=serializers.URLField()
