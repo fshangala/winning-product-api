@@ -6,12 +6,13 @@ from sales_tracker.serializers import StoreSerializer, StoreAddSerializer, AddTr
 from drf_spectacular.utils import extend_schema, inline_serializer
 from ScraperSDK.winninghunt import WinningHunt
 from ApiSDK.sales_tracker import SalesTracker
-from oauth2_provider.contrib.rest_framework.permissions import TokenHasReadWriteScope
+from oauth2_provider.contrib.rest_framework.permissions import TokenHasReadWriteScope, IsAuthenticatedOrTokenHasScope
 
 # Create your views here.
 class StoreViewSet(ViewSet):
   serializer_class=StoreSerializer
-  permission_classes=[TokenHasReadWriteScope]
+  permission_classes=[IsAuthenticatedOrTokenHasScope]
+  required_scopes=['read','write']
 
   def list(self,request):
     stores=request.user.stores.all() if request.user else Store.objects.all()

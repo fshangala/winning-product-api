@@ -9,10 +9,17 @@ class TrackDataSerializer(serializers.Serializer):
   data=serializers.JSONField()
   
   def create(self, validated_data):
-    trackData=TrackData.objects.create(**validated_data)
-    return trackData
+    trackData = validated_data["store"].track_data
+    if trackData:
+      trackData.data = validated_data["data"]
+      trackData.save()
+      return trackData
+    else:
+      trackData=TrackData.objects.create(**validated_data)
+      return trackData
 
 class StoreSerializer(serializers.Serializer):
+  id=serializers.IntegerField(read_only=True)
   user=serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
   title=serializers.CharField(required=True)
   url=serializers.URLField(required=True)
