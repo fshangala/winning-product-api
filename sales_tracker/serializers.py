@@ -9,7 +9,10 @@ class TrackDataSerializer(serializers.Serializer):
   data=serializers.JSONField()
   
   def create(self, validated_data):
-    trackData = validated_data["store"].track_data
+    try:
+      trackData = validated_data["store"].track_data
+    except TrackData.DoesNotExist:
+      trackData = None
     if trackData:
       trackData.data = validated_data["data"]
       trackData.save()
