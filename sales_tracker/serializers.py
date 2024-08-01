@@ -3,6 +3,7 @@ from sales_tracker.models import Store, TrackData
 from ApiSDK.sales_tracker import SalesTracker
 from ScraperSDK.winninghunt import WinningHunt
 from django.contrib.auth.models import User
+from ScraperSDK import shopify
 
 class TrackDataSerializer(serializers.Serializer):
   store=serializers.PrimaryKeyRelatedField(queryset=Store.objects.all())
@@ -28,6 +29,10 @@ class StoreSerializer(serializers.Serializer):
   url=serializers.URLField(required=True)
   hostname=serializers.CharField()
   track_data=TrackDataSerializer(many=False,read_only=True)
+  themedata=serializers.JSONField()
+  shopify_url=serializers.CharField()
+  locale=serializers.CharField()
+  currency=serializers.JSONField()
 
   def create(self, validated_data):
     store=Store.objects.create(**validated_data)
@@ -42,17 +47,21 @@ class StoreAddSerializer(serializers.Serializer):
 
   def validate(self, attrs):
     data=attrs
-    sales_tracker=SalesTracker()
+    
     try:
-      shopifyStore = sales_tracker.getStoreData(storeUrl=attrs["url"])
+      shop = shopify.Shopify(data["url"])
     except Exception as e:
       raise serializers.ValidationError(f"Invalid store, please make sure the provided url is of a shopify store: {str(e)}")
     else:
       serializer=StoreSerializer(data={
         "user":self.user.id,
-        "title":shopifyStore.title,
-        "url":shopifyStore.url,
-        "hostname":shopifyStore.hostname
+        "title":shop.title,
+        "url":shop.url,
+        "hostname":shop.hostname,
+        "themedata":shop.themeData,
+        "shopify_url":shop.shopify_url,
+        "locale":shop.locale,
+        "currency":shop.currency,
       })
       if serializer.is_valid():
         data=serializer.validated_data
@@ -61,14 +70,16 @@ class StoreAddSerializer(serializers.Serializer):
       store=self.user.stores.get(url=data["url"])
     except Store.DoesNotExist:
       store=None
+      
+    print(store)
     
     if store:
       raise serializers.ValidationError(f"The store {data['url']} is already being tracked")
       
     return data
 
-  def create(self, validated_data):    
-    store=Store.objects.create(**validated_data)      
+  def create(self, validated_data):
+    store=Store.objects.create(**validated_data)
     return store
 
 class AddTrackingSiteSerializer(serializers.Serializer):

@@ -82,7 +82,7 @@ class FacebookAPI:
     response = requests.get(self.ads_api_endpoint, params=params)
     responseData = response.json()
     pageAds={}
-    for ad in responseData['data']:
+    for ad in responseData.get('data',{}):
       facebookAd = FacebookAd(ad['ad_snapshot_url'])
 
       display_format=facebookAd.getAttribute('display_format')

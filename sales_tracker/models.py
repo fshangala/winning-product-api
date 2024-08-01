@@ -7,6 +7,11 @@ class Store(models.Model):
   title=models.CharField(max_length=200)
   url=models.URLField()
   hostname=models.CharField(max_length=200)
+  themedata=models.JSONField()
+  shopify_url=models.CharField(max_length=200)
+  locale=models.CharField(max_length=200)
+  currency=models.JSONField()
+  
 
   def __str__(self) -> str:
     return self.title
