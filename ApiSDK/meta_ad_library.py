@@ -18,7 +18,7 @@ class MetaAdLibrary:
     url=f"{self.baseUrl}/search/ads"
     queryParams={
       "query":search_term,
-      # "country_code":country_code
+      "country_code":country_code
     }
     response=requests.get(
       url=url,

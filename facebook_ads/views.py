@@ -5,14 +5,14 @@ from ApiSDK.meta_ad_library import MetaAdLibrary
 from facebook_ads.serializers import FacebookAdSearchSerializer
 
 class FacebookAdsViewSet(ViewSet):
+  permission_classes=[] # TODO: This must be off
   @extend_schema(
     parameters=FacebookAdSearchSerializer()
   )
   def list(self,request):
     serializer=FacebookAdSearchSerializer(data=request.query_params)
     if serializer.is_valid():
-      metaAdLibrary=MetaAdLibrary()
-      ads = metaAdLibrary.searchAds(**serializer.validated_data,country_code="US")
+      ads = serializer.retrieve()
       return Response(data=ads)
     else:
       return Response(data=serializer.errors,status=400)
