@@ -195,3 +195,29 @@ CSRF_TRUSTED_ORIGINS = [
 
 FACEBOOK_ACCESS_KEY=env("FACEBOOK_ACCESS_KEY")
 RAPID_API_KEY=env("RAPID_API_KEY")
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{name} {levelname} {asctime} {module} {message}",
+            "style": "{"
+        }
+    },
+    "handlers": {
+        "file": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "filename": os.path.join(BASE_DIR,"winning_product_api.log"),
+            "formatter": "verbose",
+        },
+    },
+    "loggers": {
+        "winning_product_api": {
+            "handlers": ["file"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+    },
+}

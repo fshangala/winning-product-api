@@ -19,6 +19,11 @@ class StoreViewSet(ViewSet):
     serializer=self.serializer_class(instance=stores,many=True)
     return Response(data=serializer.data)
   
+  def retrieve(self,request,pk):
+    store=request.user.stores.get(pk=pk)
+    serializer=self.serializer_class(instance=store)
+    return Response(serializer.data)
+  
   @extend_schema(
     request=AddTrackingSiteSerializer
   )
