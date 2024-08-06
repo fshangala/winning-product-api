@@ -1,0 +1,25 @@
+name: SSH Deploy - Refresh
+on:
+  workflow_dispatch:
+jobs:
+  ssh-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: deploy to copiwin
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: copiwin.com
+          username: root
+          key: ${{ secrets.KEY }}
+          port: 22
+          command_timeout: 30m
+          script: |
+            cd /data/winning-product-api/
+            systemctl stop copiwinapi
+            git checkout dev
+            git pull
+            rm -f db.sqlite3
+            source venv/bin/activate
+            python manage.py migrate
+            python manage.py createsuperuser --no-input
+            systemctl restart copiwinapi
