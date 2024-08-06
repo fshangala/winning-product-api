@@ -59,9 +59,12 @@ def save_ad(ad:dict,country_code:str):
 
 def search_ads(search_term:str,country_code:str):
   meta=MetaAdLibrary()
-  ads = meta.searchAds(search_term=search_term,country_code=country_code)
-  
-  if "results" in ads:
-    for adset in ads["results"]:
-      for ad in adset:
-        save_ad(ad,ads['country_code'])
+  try:
+    ads = meta.searchAds(search_term=search_term,country_code=country_code)
+  except Exception as e:
+    logger.error(str(e))
+  else:
+    if "results" in ads:
+      for adset in ads["results"]:
+        for ad in adset:
+          save_ad(ad,ads['country_code'])
