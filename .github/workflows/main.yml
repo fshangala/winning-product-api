@@ -22,10 +22,9 @@ jobs:
           key: ${{ secrets.KEY }}
           port: 22
           command_timeout: 30m
-          run: |
+          script: |
             sudo apt update
             sudo apt install sshpass -y
-            sshpass -p 'Hlb98TE1Nf9B4viUw7' ssh -o StrictHostKeyChecking=no root@copiwin.com
             cd /data/winning-product-api/
             git pull
             systemctl restart copiwinapi
