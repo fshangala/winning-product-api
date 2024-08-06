@@ -20,18 +20,22 @@ from django.urls import path, include
 from rest_framework import routers
 from scraper.urls import scraperRouter
 from accounts.urls import accountsRouter
+from sales_tracker.urls import salesTrackerRouter
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+from facebook_ads.urls import facebookAdsRouter
+from oauth2_provider import urls as oauth2_urls
 
 router = routers.DefaultRouter()
 router.registry.extend(scraperRouter.registry)
 router.registry.extend(accountsRouter.registry)
+router.registry.extend(salesTrackerRouter.registry)
+router.registry.extend(facebookAdsRouter.registry)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
     path('accounts/',include('accounts.urls', namespace='accounts')),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
-]
-
-urlpatterns += [
-    path('api-token-auth/', views.obtain_auth_token)
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('o/', include(oauth2_urls)),
+    path('api-token-auth/', views.obtain_auth_token),
 ]

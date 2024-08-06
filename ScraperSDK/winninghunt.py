@@ -3,6 +3,14 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions
+
+class TimeoutError(Exception):
+  def __init__(self, message:str, *args: object) -> None:
+    super().__init__(*args)
+    self.message=message
+    
+  def __str__(self) -> str:
+    return self.message
   
 class element_exists(object):
   def __init__(self,css_selector:str):
@@ -51,9 +59,60 @@ class WinningHunt:
       data = self.driver.execute_script("var table = document.querySelector(\"#store-table\");var data=[];for(var i=1;i<table.rows.length;i++){var row={};for(var j=0;j<table.rows[i].cells.length;j++){row[table.rows[0].cells[j].innerText]=table.rows[i].cells[j].innerText;data.push(row);}};return data;")
       
     return data
+  
+  def addTrackingSite(self,url:str):
+    self.driver.get("https://app.winninghunter.com/sales-tracker")
+    data=None
+    if "Login" in self.driver.title:
+      self.login()
+      try:
+        WebDriverWait(self.driver,10).until(expected_conditions.title_contains("Dashboard"))
+      except Exception as e:
+        raise TimeoutError(message="Did not go to dashboard after login")
+      data = self.addTrackingSite(url)
+    elif "Sales" in self.driver.title:
+      email = self.driver.find_element(By.ID, "Store-URL")
+      email.send_keys(url)
+      startButton=self.driver.find_element(By.CSS_SELECTOR,"button[type='submit']")
+      startButton.click()
+      try:
+        WebDriverWait(self.driver,10).until(expected_conditions.title_contains("Details"))
+      except Exception as e:
+        pass
+      data = self.getTrackingSites()
     
-# w = WinningHunt()
-# data = w.moveToMetaAdvertisers()
-# print(data)
-# print(type(data))
-# print(dir(data))
+    return data
+  
+  def getTrackingSites(self):
+    self.driver.get("https://app.winninghunter.com/sales-tracker")
+    data=None
+    if "Login" in self.driver.title:
+      self.login()
+      try:
+        WebDriverWait(self.driver,10).until(expected_conditions.title_contains("Dashboard"))
+      except Exception as e:
+        raise TimeoutError(message="Did not go to dashboard after login")
+      data = self.getTrackingSites()
+    elif "Sales" in self.driver.title:
+      try:
+        WebDriverWait(self.driver,10).until(element_exists("#store-table"))
+      except Exception as e:
+        raise TimeoutError(message="Did not find store-table")
+      data = self.driver.execute_script("""
+      var table = document.querySelector("#store-table");
+      var data=[];
+      for(var i=1;i<table.rows.length;i++){
+        var row={
+          "store":table.rows[i].cells[0].innerText,
+          "today":table.rows[i].cells[1].innerText,
+          "yesterday":table.rows[i].cells[2].innerText,
+          "7days":table.rows[i].cells[3].innerText,
+          "30days":table.rows[i].cells[4].innerText
+        };
+        data.push(row);
+      };
+      return data;
+      """)
+    
+    return data
+  
