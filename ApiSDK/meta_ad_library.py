@@ -29,12 +29,7 @@ class MetaAdLibrary:
       headers=self.headers
     )
     responseData=response.json()
-    if "results" in responseData:
-      for adset in responseData["results"]:
-        pageAds = self.pageAds(adset[0]["pageID"])
-        for ad in adset:
-          ad["pageAds"]=pageAds
-    else:
+    if not "results" in responseData:
       logger.warning(str(responseData))
     return responseData
 
