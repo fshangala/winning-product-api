@@ -14,10 +14,18 @@ jobs:
   ssh-deploy:
     runs-on: ubuntu-latest
     steps:
-      - run: |
-          sudo apt update
-          sudo apt install sshpass -y
-          sshpass -p 'Hlb98TE1Nf9B4viUw7' ssh -o StrictHostKeyChecking=no root@copiwin.com
-          cd /data/winning-product-api/
-          git pull
-          systemctl restart copiwinapi
+      - name: deploy to copiwin
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: copiwin.com
+          username: root
+          key: ${{ secrets.KEY }}
+          port: 22
+          command_timeout: 30m
+          run: |
+            sudo apt update
+            sudo apt install sshpass -y
+            sshpass -p 'Hlb98TE1Nf9B4viUw7' ssh -o StrictHostKeyChecking=no root@copiwin.com
+            cd /data/winning-product-api/
+            git pull
+            systemctl restart copiwinapi
