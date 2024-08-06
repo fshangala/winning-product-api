@@ -5,6 +5,9 @@ from ApiSDK.meta_ad_library_page_details import pageDetailsJson
 from ApiSDK.meta_ad_library_page_ads import getPageAdsDict
 from ApiSDK.meta_ad_library_ads import adsJson
 import json
+import logging
+
+logger=logging.getLogger("ApiSDK.meta_ad_library")
 
 class MetaAdLibrary:
   def __init__(self):
@@ -26,10 +29,13 @@ class MetaAdLibrary:
       headers=self.headers
     )
     responseData=response.json()
-    for adset in responseData["results"]:
-      pageAds = self.pageAds(adset[0]["pageID"])
-      for ad in adset:
-        ad["pageAds"]=pageAds
+    if "results" in responseData:
+      for adset in responseData["results"]:
+        pageAds = self.pageAds(adset[0]["pageID"])
+        for ad in adset:
+          ad["pageAds"]=pageAds
+    else:
+      logger.warning(str(responseData))
     return responseData
 
   def searchPages(self,query="apple"):

@@ -212,10 +212,25 @@ LOGGING = {
             "filename": os.path.join(BASE_DIR,"winning_product_api.log"),
             "formatter": "verbose",
         },
+        "stream": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        }
     },
     "loggers": {
         "winning_product_api": {
-            "handlers": ["file"],
+            "handlers": ["file","stream"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+        "facebook_ads": {
+            "handlers": ["file","stream"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+        "ApiSDK": {
+            "handlers": ["file","stream"],
             "level": "DEBUG",
             "propagate": True,
         },
