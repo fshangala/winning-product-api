@@ -12,13 +12,13 @@ class FacebookAdsViewSet(ViewSet):
   serializer_class=FacebookAdSerializer
   
   @extend_schema(
-    parameters=FacebookAdSearchSerializer()
+    parameters=[FacebookAdSearchSerializer()]
   )
   def list(self,request):
     serializer=FacebookAdSearchSerializer(data=request.query_params)
     if serializer.is_valid():
       ads = serializer.retrieve()
-      adSerializer=self.serializer_class(isinstance=ads,many=True)
+      adSerializer=self.serializer_class(instance=ads,many=True)
       return Response(data=adSerializer.data)
     else:
       return Response(data=serializer.errors,status=400)

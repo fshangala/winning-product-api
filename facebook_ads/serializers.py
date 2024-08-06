@@ -14,13 +14,17 @@ class FacebookAdSearchSerializer(serializers.Serializer):
   def retrieve(self):
     t=threading.Thread(
       target=load_facebook_ads.search_ads,
-      name="save-ads",
+      name="search-ads",
       daemon=True,
       args=(self.validated_data['search_term'],self.validated_data['country_code'])
     )
     t.start()
-    ads = FacebookAd.objects.all()
+    ads = FacebookAd.objects.filter(body_html__contains=self.validated_data['search_term'],country__code=self.validated_data['country_code'])
     return ads
+
+class FacebookAdCountrySerializer(serializers.Serializer):
+  id=serializers.IntegerField(read_only=True)
+  code=serializers.CharField(default="ALL",initial="ALL")
 
 class FacebookPageSerializer(serializers.Serializer):
   id=serializers.IntegerField(read_only=True)
@@ -38,7 +42,7 @@ class FacebookAdSerializer(serializers.Serializer):
   ad_archive_id=serializers.IntegerField()
   ad_creative_id=serializers.IntegerField()
   display_format=serializers.ChoiceField(choices=facebook_ad_display_format_choices)
-  link_url=serializers.URLField()
+  link_url=serializers.URLField(required=False)
   image=serializers.URLField()
   video=serializers.URLField()
   video_preview=serializers.URLField()
@@ -46,5 +50,6 @@ class FacebookAdSerializer(serializers.Serializer):
   start_date=serializers.DateTimeField()
   end_date=serializers.DateTimeField()
   body_html=serializers.CharField()
-  caption=serializers.CharField()
+  caption=serializers.CharField(required=False)
   cta_text=serializers.CharField()
+  country=FacebookAdCountrySerializer()
