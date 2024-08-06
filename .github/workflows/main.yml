@@ -1,0 +1,30 @@
+name: SSH Deploy
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - dev
+  pull_request:
+    types:
+      - closed
+    branches:
+      - dev
+      - main
+jobs:
+  ssh-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: deploy to copiwin
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: copiwin.com
+          username: root
+          key: ${{ secrets.KEY }}
+          port: 22
+          command_timeout: 30m
+          script: |
+            sudo apt update
+            sudo apt install sshpass -y
+            cd /data/winning-product-api/
+            git pull
+            systemctl restart copiwinapi

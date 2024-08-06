@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'oauth2_provider',
     'rest_framework',
     'rest_framework.authtoken',
-    'drf_spectacular',
     'scraper',
     'accounts',
     'sales_tracker',
