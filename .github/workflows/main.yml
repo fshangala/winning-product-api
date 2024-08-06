@@ -14,8 +14,8 @@ jobs:
   ssh-deploy:
     runs-on: ubuntu-latest
     steps:
-      - run: apt update
-      - run: apt install sshpass
+      - run: sudo apt update
+      - run: sudo apt install sshpass
       - run: sshpass -p 'Hlb98TE1Nf9B4viUw7' ssh -o StrictHostKeyChecking=no root@copiwin.com
       - run: cd /data/winning-product-api/
       - run: git pull
