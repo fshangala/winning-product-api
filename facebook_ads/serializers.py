@@ -1,15 +1,25 @@
 from rest_framework import serializers
 from ApiSDK.meta_ad_library import MetaAdLibrary
-from facebook_ads.models import facebook_ad_display_format_choices
+from facebook_ads.models import (
+  facebook_ad_display_format_choices,
+  FacebookAd
+)
+import threading
+from ApiSDK import load_facebook_ads
 
 class FacebookAdSearchSerializer(serializers.Serializer):
   search_term=serializers.CharField()
   country_code=serializers.CharField(required=False,default="US",initial="US")
   
   def retrieve(self):
-    meta=MetaAdLibrary()
-    ads = meta.searchAds(search_term=self.validated_data['search_term'],country_code=self.validated_data['country_code'])
-    
+    t=threading.Thread(
+      target=load_facebook_ads.search_ads,
+      name="save-ads",
+      daemon=True,
+      args=(self.validated_data['search_term'],self.validated_data['country_code'])
+    )
+    t.start()
+    ads = FacebookAd.objects.all()
     return ads
 
 class FacebookPageSerializer(serializers.Serializer):

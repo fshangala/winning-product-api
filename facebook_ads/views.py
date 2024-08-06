@@ -2,10 +2,15 @@ from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, inline_serializer
 from ApiSDK.meta_ad_library import MetaAdLibrary
-from facebook_ads.serializers import FacebookAdSearchSerializer
+from facebook_ads.serializers import (
+  FacebookAdSearchSerializer,
+  FacebookAdSerializer
+)
 
 class FacebookAdsViewSet(ViewSet):
   permission_classes=[] # TODO: This must be off
+  serializer_class=FacebookAdSerializer
+  
   @extend_schema(
     parameters=FacebookAdSearchSerializer()
   )
@@ -13,6 +18,7 @@ class FacebookAdsViewSet(ViewSet):
     serializer=FacebookAdSearchSerializer(data=request.query_params)
     if serializer.is_valid():
       ads = serializer.retrieve()
-      return Response(data=ads)
+      adSerializer=self.serializer_class(isinstance=ads,many=True)
+      return Response(data=adSerializer.data)
     else:
       return Response(data=serializer.errors,status=400)
