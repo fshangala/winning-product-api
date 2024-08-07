@@ -6,10 +6,17 @@ from facebook_ads.models import (
 )
 import threading
 from ApiSDK import load_facebook_ads
+from django.db.models import Q
 
+search_keyword_in_choices=(
+  ('All','All'),
+  ('adtext','Ad Text'),
+  ('pagename','Page Name'),
+)
 class FacebookAdSearchSerializer(serializers.Serializer):
-  search_term=serializers.CharField()
+  search_term=serializers.CharField(required=False,default="dress",initial="dress")
   country_code=serializers.CharField(required=False,default="FR",initial="FR")
+  search_keyword_in=serializers.ChoiceField(choices=search_keyword_in_choices,required=False,default="All",initial="All")
   
   def retrieve(self):
     t=threading.Thread(
@@ -19,9 +26,19 @@ class FacebookAdSearchSerializer(serializers.Serializer):
       args=(self.validated_data['search_term'],self.validated_data['country_code'])
     )
     t.start()
-    ads = FacebookAd.objects.filter(body_html__contains=self.validated_data['search_term'])
+    
+    ads = FacebookAd.objects.all()
+    
+    if self.validated_data['search_keyword_in'] == 'adtext':
+      ads=ads.filter(Q(body_html__contains=self.validated_data['search_term']))
+    elif self.validated_data['search_keyword_in'] == 'pagename':
+      ads=ads.filter(Q(page__name__contains=self.validated_data['search_term']))
+    elif self.validated_data['search_keyword_in'] == 'All':
+      ads=ads.filter(Q(page__name__contains=self.validated_data['search_term']) | Q(body_html__contains=self.validated_data['search_term']))
+    
     if self.validated_data['country_code'] != 'ALL':
       ads = ads.filter(country__code=self.validated_data['country_code'])
+      
     return ads
 
 class FacebookAdCountrySerializer(serializers.Serializer):
