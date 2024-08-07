@@ -6,7 +6,7 @@ import logging
 logger = logging.getLogger("ApiSDK.load_facebook_ads")
 
 def save_ad(ad:dict,country_code:str):
-  if ad['snapshot']['display_format'] in ['video','image','carousel','dco']:
+  if ad['snapshot']['display_format'] in ['video','image']:
     try:
       ad=FacebookAd.objects.get(ad_archive_id=ad['adArchiveID'])
     except FacebookAd.DoesNotExist as e:
