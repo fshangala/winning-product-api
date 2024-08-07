@@ -9,7 +9,7 @@ from ApiSDK import load_facebook_ads
 
 class FacebookAdSearchSerializer(serializers.Serializer):
   search_term=serializers.CharField()
-  country_code=serializers.CharField(required=False,default="US",initial="US")
+  country_code=serializers.CharField(required=False,default="FR",initial="FR")
   
   def retrieve(self):
     t=threading.Thread(
@@ -19,7 +19,9 @@ class FacebookAdSearchSerializer(serializers.Serializer):
       args=(self.validated_data['search_term'],self.validated_data['country_code'])
     )
     t.start()
-    ads = FacebookAd.objects.filter(body_html__contains=self.validated_data['search_term'],country__code=self.validated_data['country_code'])
+    ads = FacebookAd.objects.filter(body_html__contains=self.validated_data['search_term'])
+    if self.validated_data['country_code'] != 'ALL':
+      ads = ads.filter(country__code=self.validated_data['country_code'])
     return ads
 
 class FacebookAdCountrySerializer(serializers.Serializer):
