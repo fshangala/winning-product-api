@@ -69,7 +69,7 @@ class FacebookAdSearchSerializer(serializers.Serializer):
       ads = ads.order_by("-body_html")
     
     # ad_creation_date
-    if self.validated_data['ad_creation_date'] != None:
+    if self.validated_data.get('ad_creation_date') != None:
       ad_creation_date=self.validated_data['ad_creation_date'].split(' - ')
       print(ad_creation_date)
       ad_creation_date_start=timezone.datetime.strptime(ad_creation_date[0],"%d/%m/%Y")
