@@ -32,15 +32,17 @@ class FacebookAdSearchSerializer(serializers.Serializer):
   media_type=serializers.ChoiceField(choices=media_type_choices,default='all',initial='all',required=False)
   sort_direction=serializers.ChoiceField(choices=sort_direction_choices,default='asc',initial='asc',required=False)
   ad_creation_date=serializers.CharField(required=False)
+  offset=serializers.IntegerField(default=0,initial=0,required=False)
   
   def retrieve(self):
-    t=threading.Thread(
-      target=load_facebook_ads.search_ads,
-      name="search-ads",
-      daemon=True,
-      args=(self.validated_data['search_term'],self.validated_data['country_code'])
-    )
-    t.start()
+    if not self.validated_data['offset'] > 0:
+      t=threading.Thread(
+        target=load_facebook_ads.search_ads,
+        name="search-ads",
+        daemon=True,
+        args=(self.validated_data['search_term'],self.validated_data['country_code'])
+      )
+      t.start()
     
     ads = FacebookAd.objects.all()
     

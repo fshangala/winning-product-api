@@ -60,7 +60,8 @@ def save_ad(ad:dict,country_code:str):
   else:
     return None
 
-def search_ads(search_term:str,country_code:str,continuation_token=None):
+def search_ads(search_term:str,country_code:str,continuation_token=None,count=0):
+  delta = count+1
   meta=MetaAdLibrary()
   try:
     ads = meta.searchAds(search_term=search_term,country_code=country_code,continuation_token=continuation_token)
@@ -72,5 +73,5 @@ def search_ads(search_term:str,country_code:str,continuation_token=None):
         for ad in adset:
           save_ad(ad,ads['country_code'])
     
-      if not ads["is_result_complete"]:
-        search_ads(search_term=search_term,country_code=country_code,continuation_token=ads["continuation_token"])
+      if not ads["is_result_complete"] and delta < 6:
+        search_ads(search_term=search_term,country_code=country_code,continuation_token=ads["continuation_token"],count=delta)
