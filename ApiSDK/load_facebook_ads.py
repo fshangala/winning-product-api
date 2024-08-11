@@ -60,10 +60,10 @@ def save_ad(ad:dict,country_code:str):
   else:
     return None
 
-def search_ads(search_term:str,country_code:str):
+def search_ads(search_term:str,country_code:str,continuation_token=None):
   meta=MetaAdLibrary()
   try:
-    ads = meta.searchAds(search_term=search_term,country_code=country_code)
+    ads = meta.searchAds(search_term=search_term,country_code=country_code,continuation_token=continuation_token)
   except Exception as e:
     logger.error(str(e))
   else:
@@ -71,3 +71,6 @@ def search_ads(search_term:str,country_code:str):
       for adset in ads["results"]:
         for ad in adset:
           save_ad(ad,ads['country_code'])
+    
+      if not ads["is_result_complete"]:
+        search_ads(search_term=search_term,country_code=country_code,continuation_token=ads["continuation_token"])

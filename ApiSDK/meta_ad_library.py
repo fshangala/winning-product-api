@@ -13,12 +13,15 @@ class MetaAdLibrary:
       "x-rapidapi-host": "meta-ad-library.p.rapidapi.com"
     }
 
-  def searchAds(self,search_term,country_code):
+  def searchAds(self,search_term,country_code,continuation_token=None):
     url=f"{self.baseUrl}/search/ads"
     queryParams={
       "query":search_term,
       "country_code":country_code
     }
+    if continuation_token:
+      queryParams["continuation_token"] = continuation_token
+      
     response=requests.get(
       url=url,
       params=queryParams,
