@@ -36,7 +36,7 @@ class FacebookAdSearchSerializer(serializers.Serializer):
   randomize=serializers.BooleanField(required=False,default=False,initial=False)
   
   def retrieve(self):
-    if not self.validated_data['offset'] > 0 and self.validated_data['search_term'] != None:
+    if not self.validated_data['offset'] > 0 and self.validated_data.get('search_term') != None:
       t=threading.Thread(
         target=load_facebook_ads.search_ads,
         name="search-ads",
@@ -48,7 +48,7 @@ class FacebookAdSearchSerializer(serializers.Serializer):
     ads = FacebookAd.objects.all()
     
     # search_keyword_id
-    if self.validated_data['search_term']:
+    if self.validated_data.get('search_term'):
       if self.validated_data['search_keyword_in'] == 'adtext':
         ads=ads.filter(Q(body_html__contains=self.validated_data['search_term']))
       elif self.validated_data['search_keyword_in'] == 'pagename':
