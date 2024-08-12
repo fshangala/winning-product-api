@@ -33,6 +33,7 @@ class FacebookAdSearchSerializer(serializers.Serializer):
   sort_direction=serializers.ChoiceField(choices=sort_direction_choices,default='asc',initial='asc',required=False)
   ad_creation_date=serializers.CharField(required=False)
   offset=serializers.IntegerField(default=0,initial=0,required=False)
+  randomize=serializers.BooleanField(required=False,default=False,initial=False)
   
   def retrieve(self):
     if not self.validated_data['offset'] > 0 and self.validated_data['search_term'] != None:
@@ -78,6 +79,9 @@ class FacebookAdSearchSerializer(serializers.Serializer):
       ad_creation_date_start=timezone.datetime.strptime(ad_creation_date[0],"%d/%m/%Y")
       ad_creation_date_stop=timezone.datetime.strptime(ad_creation_date[1],"%d/%m/%Y")
       ads = ads.filter(creation_time__gte=ad_creation_date_start).filter(creation_time__lte=ad_creation_date_stop)
+    
+    if self.validated_data['randomize']:
+      ads=ads.order_by('?')
       
     return ads
 
