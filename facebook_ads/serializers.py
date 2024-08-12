@@ -26,7 +26,7 @@ sort_direction_choices=(
   ('desc','Descending'),
 )
 class FacebookAdSearchSerializer(serializers.Serializer):
-  search_term=serializers.CharField(required=False,default="dress",initial="dress")
+  search_term=serializers.CharField(required=False)
   country_code=serializers.CharField(required=False,default="FR",initial="FR")
   search_keyword_in=serializers.ChoiceField(choices=search_keyword_in_choices,required=False,default="All",initial="All")
   media_type=serializers.ChoiceField(choices=media_type_choices,default='all',initial='all',required=False)
@@ -35,7 +35,7 @@ class FacebookAdSearchSerializer(serializers.Serializer):
   offset=serializers.IntegerField(default=0,initial=0,required=False)
   
   def retrieve(self):
-    if not self.validated_data['offset'] > 0:
+    if not self.validated_data['offset'] > 0 and self.validated_data['search_term'] != None:
       t=threading.Thread(
         target=load_facebook_ads.search_ads,
         name="search-ads",
@@ -47,12 +47,13 @@ class FacebookAdSearchSerializer(serializers.Serializer):
     ads = FacebookAd.objects.all()
     
     # search_keyword_id
-    if self.validated_data['search_keyword_in'] == 'adtext':
-      ads=ads.filter(Q(body_html__contains=self.validated_data['search_term']))
-    elif self.validated_data['search_keyword_in'] == 'pagename':
-      ads=ads.filter(Q(page__name__contains=self.validated_data['search_term']))
-    elif self.validated_data['search_keyword_in'] == 'All':
-      ads=ads.filter(Q(page__name__contains=self.validated_data['search_term']) | Q(body_html__contains=self.validated_data['search_term']))
+    if self.validated_data['search_term']:
+      if self.validated_data['search_keyword_in'] == 'adtext':
+        ads=ads.filter(Q(body_html__contains=self.validated_data['search_term']))
+      elif self.validated_data['search_keyword_in'] == 'pagename':
+        ads=ads.filter(Q(page__name__contains=self.validated_data['search_term']))
+      elif self.validated_data['search_keyword_in'] == 'All':
+        ads=ads.filter(Q(page__name__contains=self.validated_data['search_term']) | Q(body_html__contains=self.validated_data['search_term']))
     
     # country_code
     if self.validated_data['country_code'] != 'ALL':
