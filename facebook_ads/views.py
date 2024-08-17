@@ -30,6 +30,11 @@ class FacebookAdsViewSet(ViewSet):
       return paginator.get_paginated_response(adSerializer.data)
     else:
       return Response(data=serializer.errors,status=400)
+  
+  def retrieve(self,request,pk):
+    facebookAd=FacebookAd.objects.get(pk=pk)
+    serializer=self.serializer_class(instance=facebookAd)
+    return Response(data=serializer.data)
 
 class SavedFacebookAdViewSet(ViewSet):
   permission_classes=[]
