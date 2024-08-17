@@ -1,5 +1,6 @@
 from rest_framework.routers import DefaultRouter
-from facebook_ads.views import FacebookAdsViewSet
+from facebook_ads.views import FacebookAdsViewSet, SavedFacebookAdViewSet
 
 facebookAdsRouter=DefaultRouter()
 facebookAdsRouter.register(r"facebook-ads/search",viewset=FacebookAdsViewSet,basename="search-facebook-ads")
+facebookAdsRouter.register(r"facebook-ads/saved-facebook-ads",viewset=SavedFacebookAdViewSet,basename="saved-facebook-ads")

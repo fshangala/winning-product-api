@@ -2,12 +2,15 @@ from rest_framework import serializers
 from ApiSDK.meta_ad_library import MetaAdLibrary
 from facebook_ads.models import (
   facebook_ad_display_format_choices,
-  FacebookAd
+  FacebookAd,
+  SavedFacebookAd
 )
 import threading
 from ApiSDK import load_facebook_ads
 from django.db.models import Q
 from django.utils import timezone
+from django.contrib.auth.models import User
+from accounts.serializers import UserSerializer
 
 search_keyword_in_choices=(
   ('All','All'),
@@ -116,3 +119,25 @@ class FacebookAdSerializer(serializers.Serializer):
   caption=serializers.CharField(required=False)
   cta_text=serializers.CharField()
   country=FacebookAdCountrySerializer()
+  
+class SavedFacebookAdSerializer(serializers.Serializer):
+  id=serializers.IntegerField(read_only=True)
+  user=UserSerializer(many=False)
+  ad=FacebookAdSerializer(many=False)
+
+class SaveFacebookAdSerializer(serializers.Serializer):
+  ad=serializers.PrimaryKeyRelatedField(queryset=FacebookAd.objects.all())
+  
+  def __init__(self,user:User,*args,**kwargs):
+    super().__init__(*args,**kwargs)
+    self.user=user
+  
+  def validate(self,data):
+    data['user']=self.user
+    return data
+  
+  def create(self,validated_data):
+    saved_ad=SavedFacebookAd.objects.create(
+      **validated_data
+    )
+    return saved_ad

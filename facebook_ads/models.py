@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 class AdCountry(models.Model):
@@ -50,4 +51,11 @@ class FacebookAd(models.Model):
   
   def __str__(self):
     return str(self.ad_archive_id)
+
+class SavedFacebookAd(models.Model):
+  user=models.ForeignKey(to=User,on_delete=models.CASCADE,related_name="saved_facebook_ads")
+  ad=models.ForeignKey(to=FacebookAd,on_delete=models.CASCADE,related_name="saved_facebook_ads")
+  
+  def __str__(self):
+      return self.ad.ad_archive_id
   
