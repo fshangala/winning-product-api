@@ -25,4 +25,6 @@ jobs:
           script: |
             cd /data/winning-product-api/
             git pull
+            source venv/bin/activate
+            python manage.py migrate
             systemctl restart copiwinapi
