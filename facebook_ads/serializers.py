@@ -138,6 +138,13 @@ class SaveFacebookAdSerializer(serializers.Serializer):
     except FacebookAd.DoesNotExist as e:
       raise serializers.ValidationError(e)
     
+    try:
+      self.user.saved_facebook_ads.get(ad_archive_id=data["ad_archive_id"])
+    except FacebookAd.DoesNotExist as e:
+      pass
+    else:
+      raise serializers.ValidationError("Ad already saved!")
+    
     return data
   
   def create(self,validated_data):
