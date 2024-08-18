@@ -134,12 +134,12 @@ class SaveFacebookAdSerializer(serializers.Serializer):
   
   def validate(self,data):
     try:
-      FacebookAd.objects.get(ad_archive_id=data["ad_archive_id"])
+      ad = FacebookAd.objects.get(ad_archive_id=data["ad_archive_id"])
     except FacebookAd.DoesNotExist as e:
       raise serializers.ValidationError(e)
     
     try:
-      self.user.saved_facebook_ads.get(ad_archive_id=data["ad_archive_id"])
+      self.user.saved_facebook_ads.get(ad=ad)
     except FacebookAd.DoesNotExist as e:
       pass
     else:
