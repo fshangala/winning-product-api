@@ -126,18 +126,24 @@ class SavedFacebookAdSerializer(serializers.Serializer):
   ad=FacebookAdSerializer(many=False)
 
 class SaveFacebookAdSerializer(serializers.Serializer):
-  ad=serializers.PrimaryKeyRelatedField(queryset=FacebookAd.objects.all())
+  ad_archive_id=serializers.IntegerField()
   
   def __init__(self,user:User,*args,**kwargs):
     super().__init__(*args,**kwargs)
     self.user=user
   
   def validate(self,data):
-    data['user']=self.user
+    try:
+      FacebookAd.objects.get(ad_archive_id=data["ad_archive_id"])
+    except FacebookAd.DoesNotExist as e:
+      raise serializers.ValidationError(e)
+    
     return data
   
   def create(self,validated_data):
+    ad=FacebookAd.objects.get(ad_archive_id=data["ad_archive_id"])
     saved_ad=SavedFacebookAd.objects.create(
-      **validated_data
+      ad=ad,
+      user=self.user
     )
     return saved_ad
