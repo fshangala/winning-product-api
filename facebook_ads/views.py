@@ -58,5 +58,5 @@ class SavedFacebookAdViewSet(ViewSet):
       saved_ad=serializer.save()
       return Response(data=self.serializer_class(instance=saved_ad).data)
     else:
-      return Response(data=serializer.errors,status=401)
+      return Response(data=serializer.errors,status=400)
     

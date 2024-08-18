@@ -141,7 +141,7 @@ class SaveFacebookAdSerializer(serializers.Serializer):
     return data
   
   def create(self,validated_data):
-    ad=FacebookAd.objects.get(ad_archive_id=data["ad_archive_id"])
+    ad=FacebookAd.objects.get(ad_archive_id=validated_data["ad_archive_id"])
     saved_ad=SavedFacebookAd.objects.create(
       ad=ad,
       user=self.user
