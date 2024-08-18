@@ -32,7 +32,7 @@ class FacebookAdsViewSet(ViewSet):
       return Response(data=serializer.errors,status=400)
   
   def retrieve(self,request,pk):
-    facebookAd=FacebookAd.objects.get(pk=pk)
+    facebookAd=FacebookAd.objects.get(ad_archive_id=pk)
     serializer=self.serializer_class(instance=facebookAd)
     return Response(data=serializer.data)
 
