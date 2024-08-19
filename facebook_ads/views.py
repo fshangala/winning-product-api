@@ -37,7 +37,6 @@ class FacebookAdsViewSet(ViewSet):
     return Response(data=serializer.data)
 
 class SavedFacebookAdViewSet(ViewSet):
-  permission_classes=[]
   serializer_class=SavedFacebookAdSerializer
   
   def list(self,request):
