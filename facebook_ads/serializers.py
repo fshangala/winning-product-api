@@ -140,7 +140,7 @@ class SaveFacebookAdSerializer(serializers.Serializer):
     
     try:
       self.user.saved_facebook_ads.get(ad=ad)
-    except FacebookAd.DoesNotExist as e:
+    except SavedFacebookAd.DoesNotExist as e:
       pass
     else:
       raise serializers.ValidationError("Ad already saved!")
