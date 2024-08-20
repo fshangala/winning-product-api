@@ -2,7 +2,12 @@ from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers
 from sales_tracker.models import Store
-from sales_tracker.serializers import StoreSerializer, StoreAddSerializer, AddTrackingSiteSerializer, TrackDataSerializer
+from sales_tracker.serializers import (
+  StoreSerializer, StoreAddSerializer, 
+  AddTrackingSiteSerializer, 
+  TrackDataSerializer, 
+  ImportProductSerializer
+)
 from drf_spectacular.utils import extend_schema, inline_serializer
 from ScraperSDK.winninghunt import WinningHunt
 from ApiSDK.sales_tracker import SalesTracker
@@ -49,5 +54,15 @@ class TrackDataViewSet(ViewSet):
     if serializer.is_valid():
       trackData=serializer.save()
       return Response(data=StoreSerializer(instance=trackData.store).data,status=201)
+    else:
+      return Response(data=serializer.errors,status=400)
+
+class ImportProductViewSet(ViewSet):
+  serializer_class=ImportProductSerializer
+  def create(self,request):
+    serializer = self.serializer_class(data=request.data)
+    if serializer.is_valid():
+      response=serializer.save()
+      return Response(data=response)
     else:
       return Response(data=serializer.errors,status=400)

@@ -5,6 +5,7 @@ from ScraperSDK.winninghunt import WinningHunt
 from django.contrib.auth.models import User
 from ScraperSDK import shopify
 import logging
+import requests
 
 logger = logging.getLogger(__file__)
 
@@ -121,4 +122,43 @@ class StoreAddSerializer(serializers.Serializer):
 
 class AddTrackingSiteSerializer(serializers.Serializer):
   url=serializers.URLField()
+
+class ImportProductSerializer(serializers.Serializer):
+  product_url=serializers.URLField()
+  store_url=serializers.URLField()
   
+  def __init__(self,*args,user,**kwargs):
+    super().__init__(*args,**kwargs)
+    self.user=user
+  
+  def validate(self,data):
+    try:
+      product=shopify.Shopify(validated_data["product_url"])
+    except Exception as e:
+      raise serializers.ValidationError(str(e))
+    
+    try:
+      store=shopify.Shopify(validated_data["store_url"])
+    except Exception as e:
+      raise serializers.ValidationError(str(e))
+    
+    return data
+  
+  def create(self,validated_data):
+    store=self.user.my_stores.get(url=validated_data["store_url"])
+    response=requests.post(url=f"{store.store.shopify_url}/admin/api/2024-07/products.json",data={
+      "product":{
+        "title":store.title,
+        "body_html":store.title,
+        "vendor":"Burton",
+        "product_type":"Snowboard",
+        "status":"draft"
+      }
+    },headers={
+      "X-Shopify-Access-Token":f"{store.store.access_token}",
+      "Content-Type":"application/json",
+    })
+    logger.info(response.json())
+    return response.json()
+
+    
