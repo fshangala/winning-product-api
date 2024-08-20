@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from sales_tracker.models import ShopifyStore
 
 # Create your models here.
 class AdCountry(models.Model):
@@ -48,6 +49,7 @@ class FacebookAd(models.Model):
   caption=models.CharField(max_length=200,null=True)
   cta_text=models.CharField(max_length=200,null=True)
   country=models.ForeignKey(to=AdCountry,on_delete=models.CASCADE,related_name='ads')
+  shopifyStore=models.ForeignKey(to=ShopifyStore,on_delete=models.CASCADE,related_name="facebook_ads",null=True)
   
   def __str__(self):
     return str(self.ad_archive_id)

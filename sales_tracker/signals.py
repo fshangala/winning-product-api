@@ -1,0 +1,2 @@
+def onFacebookAdSaved():
+  pass

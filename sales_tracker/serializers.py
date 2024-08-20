@@ -1,9 +1,46 @@
 from rest_framework import serializers
-from sales_tracker.models import Store, TrackData
+from sales_tracker.models import Store, TrackData, ShopifyStore
 from ApiSDK.sales_tracker import SalesTracker
 from ScraperSDK.winninghunt import WinningHunt
 from django.contrib.auth.models import User
 from ScraperSDK import shopify
+import logging
+
+logger = logging.getLogger(__file__)
+
+class AddShopifyStoreByUrlSerializer(serializers.Serializer):
+  url=serializers.URLField()
+
+  def validate(self, attrs):
+    data=attrs
+    
+    try:
+      shop = shopify.Shopify(attrs["url"])
+    except Exception as e:
+      raise serializers.ValidationError(f"Invalid store, please make sure the provided url is of a shopify store: {str(e)}")
+    else:
+      data["title"]=shop.title
+      data["url"]=shop.url
+      data["hostname"]=shop.hostname
+      data["themedata"]=shop.themeData
+      data["shopify_url"]=shop.shopify_url
+      data["locale"]=shop.locale
+      data["currency"]=shop.currency
+
+    try:
+      store=ShopifyStore.objects.get(url=data["url"])
+    except ShopifyStore.DoesNotExist:
+      pass
+    else:
+      raise serializers.ValidationError(f"Store {shop.title} exists!")
+      
+    return data
+
+  def create(self, validated_data):
+    store=ShopifyStore.objects.create(**validated_data)
+    return store
+  
+  
 
 class TrackDataSerializer(serializers.Serializer):
   store=serializers.PrimaryKeyRelatedField(queryset=Store.objects.all())

@@ -1,5 +1,7 @@
 from ApiSDK.meta_ad_library import MetaAdLibrary
+from ScraperSDK.shopify import Shopify
 from facebook_ads.models import FacebookAd, FacebookPage, FacebookCreative, AdCountry
+from sales_tracker.serializers import AddShopifyStoreByUrlSerializer
 from django.utils import timezone
 import logging
 
@@ -45,13 +47,30 @@ def save_ad(ad:dict,country_code:str):
         body_html=ad['snapshot']['body']['markup']['__html'],
         caption=ad['snapshot']['caption'],
         cta_text=ad['snapshot']['cta_text'],
-        country=ad_country
+        country=ad_country,
       )
       adObj.image=ad['snapshot']['images'][0]['original_image_url'] if len(ad['snapshot']['images']) > 0 else None
       
       if len(ad['snapshot']['videos']) > 0:
         adObj.video=ad['snapshot']['videos'][0]['video_sd_url']
         adObj.video_preview=ad['snapshot']['videos'][0]['video_preview_image_url']
+      
+      try:
+        store=Shopify(url=ad['snapshot']['link_url'])
+      except Exception as e:
+        logger.error(str(e))
+      else:
+        storeSerializer=AddShopifyStoreByUrlSerializer(data={
+          "title":store.title,
+          "url":store.url,
+          "hostname":store.hostname,
+          "themedata":store.themeData,
+          "shopify_url":store.shopify_url,
+          "locale":store.locale,
+          "currency":store.currency,
+        })
+        if storeSerializer.is_valid():
+          adObj.shopifyStore=storeSerializer.save()
       
       adObj.save()
       return adObj
