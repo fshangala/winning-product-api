@@ -24,6 +24,7 @@ jobs:
           command_timeout: 30m
           script: |
             cd /data/winning-product-api/
+            git checkout dev
             git pull
             source venv/bin/activate
             python manage.py migrate
