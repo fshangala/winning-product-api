@@ -41,9 +41,17 @@ class AddShopifyStoreByUrlSerializer(serializers.Serializer):
     store=ShopifyStore.objects.create(**validated_data)
     return store
 
+class RequestAddUserShopifyStoreByUrlSerializer(serializers.Serializer):
+  url=serializers.URLField()
+  access_token=serializers.CharField()  
+
 class AddUserShopifyStoreByUrlSerializer(serializers.Serializer):
   url=serializers.URLField()
   access_token=serializers.CharField()
+  
+  def __init__(self,*args,user:User,**kwargs):
+    super().__init__(*args,**kwargs)
+    self.user=user
   
   def validate(self,data):
     serializer=AddShopifyStoreByUrlSerializer(data={"url":data["url"]})
@@ -78,7 +86,7 @@ class ShopifyStoreSerializer(serializers.Serializer):
 class UserShopifyStoreSerializer(serializers.Serializer):
   id=serializers.IntegerField(read_only=True)
   user=serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-  store=serializers.PrimaryKeyRelatedField(queryset=ShopifyStore.objects.all())
+  store=ShopifyStoreSerializer(many=False)
   access_token=serializers.CharField()
   
   def create(self, validated_data):

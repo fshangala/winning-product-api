@@ -7,7 +7,10 @@ from sales_tracker.serializers import (
   AddTrackingSiteSerializer, 
   TrackDataSerializer, 
   ImportProductSerializer,
-  RequestImportProductSerializer
+  RequestImportProductSerializer,
+  RequestAddUserShopifyStoreByUrlSerializer,
+  AddUserShopifyStoreByUrlSerializer,
+  UserShopifyStoreSerializer,
 )
 from drf_spectacular.utils import extend_schema, inline_serializer
 from ScraperSDK.winninghunt import WinningHunt
@@ -73,5 +76,18 @@ class ImportProductViewSet(ViewSet):
     if serializer.is_valid():
       response=serializer.save()
       return Response(data=response)
+    else:
+      return Response(data=serializer.errors,status=400)
+
+class UserShopifyStoreViewSet(ViewSet):
+  serializer_class=RequestAddUserShopifyStoreByUrlSerializer
+  permission_classes=[IsAuthenticatedOrTokenHasScope]
+  required_scopes=['read','write']
+  
+  def create(self,request):
+    serializer=AddUserShopifyStoreByUrlSerializer(data=request.data,user=request.user)
+    if serializer.is_valid():
+      userStore=serializer.save()
+      return Response(data=UserShopifyStoreSerializer(instance=userStore).data)
     else:
       return Response(data=serializer.errors,status=400)
