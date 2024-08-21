@@ -84,6 +84,11 @@ class UserShopifyStoreViewSet(ViewSet):
   permission_classes=[IsAuthenticatedOrTokenHasScope]
   required_scopes=['read','write']
   
+  @extend_schema(
+    responses={
+      201:UserShopifyStoreSerializer()
+    }
+  )
   def create(self,request):
     serializer=AddUserShopifyStoreByUrlSerializer(data=request.data,user=request.user)
     if serializer.is_valid():
