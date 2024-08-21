@@ -6,7 +6,8 @@ import re
 
 class ShopifyProduct:
   def __init__(self,url):
-    response = requests.get(url+".json")
+    extractedUrl = url.split("?")[0]
+    response = requests.get(extractedUrl+".json")
     data = response.json()
     try:
       self.data=data["product"]
