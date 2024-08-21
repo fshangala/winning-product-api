@@ -14,6 +14,9 @@ class Command(BaseCommand):
       if ad.cta_text == "Shop now":
         serializer=AddShopifyStoreByUrlSerializer(data={"url":ad.link_url})
         if serializer.is_valid():
-          serializer.save()
+          store=serializer.save()
+          ad.shopifyStore=store
+          ad.save()
+          
         else:
           logger.warning(serializer.errors)
