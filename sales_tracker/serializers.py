@@ -40,8 +40,30 @@ class AddShopifyStoreByUrlSerializer(serializers.Serializer):
   def create(self, validated_data):
     store=ShopifyStore.objects.create(**validated_data)
     return store
+
+class ShopifyStoreSerializer(serializers.Serializer):
+  id=serializers.IntegerField(read_only=True)
+  title=serializers.CharField(required=True)
+  url=serializers.URLField(required=True)
+  hostname=serializers.CharField()
+  themedata=serializers.JSONField()
+  shopify_url=serializers.CharField()
+  locale=serializers.CharField()
+  currency=serializers.JSONField()
+
+  def create(self, validated_data):
+    store=ShopifyStore.objects.create(**validated_data)
+    return store
+
+class UserShopifyStoreSerializer(serializers.Serializer):
+  id=serializers.IntegerField(read_only=True)
+  user=serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+  store=serializers.PrimaryKeyRelatedField(queryset=ShopifyStore.objects.all())
+  access_token=serializers.CharField()
   
-  
+  def create(self, validated_data):
+    userShopifyStore=ShopifyStore.objects.create(**validated_data)
+    return userShopifyStore
 
 class TrackDataSerializer(serializers.Serializer):
   store=serializers.PrimaryKeyRelatedField(queryset=Store.objects.all())

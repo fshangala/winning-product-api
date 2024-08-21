@@ -3,6 +3,7 @@ from rest_framework import serializers
 from accounts.models import Profile
 import requests
 from oauth2_provider.models import Application
+from sales_tracker.serializers import UserShopifyStoreSerializer
 
 class ProfileSerializer(serializers.Serializer):
   user=serializers.PrimaryKeyRelatedField(read_only=True)
@@ -22,6 +23,7 @@ class UserSerializer(serializers.Serializer):
   is_active=serializers.BooleanField(read_only=True)
   last_login=serializers.DateTimeField(read_only=True)
   date_joined=serializers.DateTimeField(read_only=True)
+  my_stores=UserShopifyStoreSerializer(read_only=True,many=True)
   
   def create(self, validated_data:dict):
     profile_data=validated_data.pop("profile",None)
