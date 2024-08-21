@@ -4,6 +4,15 @@ from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 import re
 
+class ShopifyProduct:
+  def __init__(self,url):
+    response = requests.get(url+".json")
+    data = response.json()
+    try:
+      self.data=data["product"]
+    except Exception as e:
+      raise Exception(f"{url} is not a shopify product!: {str(e)}")
+
 class Shopify:
   def __init__(self,url) -> None:
     response = requests.get(url)

@@ -130,35 +130,40 @@ class ImportProductSerializer(serializers.Serializer):
   def __init__(self,*args,user,**kwargs):
     super().__init__(*args,**kwargs)
     self.user=user
+    self.product=None
+    self.store=None
   
   def validate(self,data):
     try:
-      product=shopify.Shopify(validated_data["product_url"])
+      self.product=shopify.ShopifyProduct(validated_data["product_url"])
     except Exception as e:
       raise serializers.ValidationError(str(e))
     
     try:
       store=shopify.Shopify(validated_data["store_url"])
+      self.store=self.user.my_stores.get(url=store.url)
     except Exception as e:
       raise serializers.ValidationError(str(e))
     
     return data
   
   def create(self,validated_data):
-    store=self.user.my_stores.get(url=validated_data["store_url"])
-    response=requests.post(url=f"{store.store.shopify_url}/admin/api/2024-07/products.json",data={
+    response=requests.post(url=f"{self.store.store.shopify_url}/admin/api/2024-07/products.json",data={
       "product":{
-        "title":store.title,
-        "body_html":store.title,
-        "vendor":"Burton",
-        "product_type":"Snowboard",
+        "title":self.product["title"],
+        "body_html":self.product["body_html"],
+        "vendor":self.product["vendor"],
+        "product_type":self.product["product_type"],
         "status":"draft"
       }
     },headers={
-      "X-Shopify-Access-Token":f"{store.store.access_token}",
+      "X-Shopify-Access-Token":f"{self.store.access_token}",
       "Content-Type":"application/json",
     })
     logger.info(response.json())
     return response.json()
 
-    
+class RequestImportProductSerializer(serializers.Serializer):
+  product_url=serializers.URLField()
+  store_url=serializers.URLField()
+ 

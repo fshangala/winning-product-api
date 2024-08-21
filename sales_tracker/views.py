@@ -6,7 +6,8 @@ from sales_tracker.serializers import (
   StoreSerializer, StoreAddSerializer, 
   AddTrackingSiteSerializer, 
   TrackDataSerializer, 
-  ImportProductSerializer
+  ImportProductSerializer,
+  RequestImportProductSerializer
 )
 from drf_spectacular.utils import extend_schema, inline_serializer
 from ScraperSDK.winninghunt import WinningHunt
@@ -58,9 +59,15 @@ class TrackDataViewSet(ViewSet):
       return Response(data=serializer.errors,status=400)
 
 class ImportProductViewSet(ViewSet):
-  serializer_class=ImportProductSerializer
+  serializer_class=RequestImportProductSerializer
+  
+  @extend_schema(
+    responses={
+      201:RequestImportProductSerializer(many=False)
+    }
+  )
   def create(self,request):
-    serializer = self.serializer_class(data=request.data)
+    serializer = ImportProductSerializer(data=request.data,user=request.user)
     if serializer.is_valid():
       response=serializer.save()
       return Response(data=response)
