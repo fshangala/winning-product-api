@@ -59,6 +59,8 @@ class TrackDataViewSet(ViewSet):
       return Response(data=serializer.errors,status=400)
 
 class ImportProductViewSet(ViewSet):
+  permission_classes=[IsAuthenticatedOrTokenHasScope]
+  required_scopes=['read','write']
   serializer_class=RequestImportProductSerializer
   
   @extend_schema(

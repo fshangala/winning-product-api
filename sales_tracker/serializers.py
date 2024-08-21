@@ -135,13 +135,13 @@ class ImportProductSerializer(serializers.Serializer):
   
   def validate(self,data):
     try:
-      self.product=shopify.ShopifyProduct(validated_data["product_url"])
+      self.product=shopify.ShopifyProduct(data["product_url"])
     except Exception as e:
       raise serializers.ValidationError(str(e))
     
     try:
-      store=shopify.Shopify(validated_data["store_url"])
-      self.store=self.user.my_stores.get(url=store.url)
+      store=shopify.Shopify(data["store_url"])
+      self.store=self.user.my_stores.get(store__url=store.url)
     except Exception as e:
       raise serializers.ValidationError(str(e))
     
