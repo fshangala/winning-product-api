@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from sales_tracker.models import Store, TrackData, ShopifyStore
+from sales_tracker.models import Store, TrackData, ShopifyStore, UserShopifyStore
 from ApiSDK.sales_tracker import SalesTracker
 from ScraperSDK.winninghunt import WinningHunt
 from django.contrib.auth.models import User
@@ -11,7 +11,7 @@ logger = logging.getLogger(__file__)
 
 class AddShopifyStoreByUrlSerializer(serializers.Serializer):
   url=serializers.URLField()
-
+  
   def validate(self, attrs):
     data=attrs
     
@@ -40,6 +40,26 @@ class AddShopifyStoreByUrlSerializer(serializers.Serializer):
   def create(self, validated_data):
     store=ShopifyStore.objects.create(**validated_data)
     return store
+
+class AddUserShopifyStoreByUrlSerializer(serializers.Serializer):
+  url=serializers.URLField()
+  access_token=serializers.CharField()
+  
+  def validate(self,data):
+    serializer=AddShopifyStoreByUrlSerializer(data={"url":data["url"]})
+    if serializer.is_valid():
+      store=serializer.save()
+      data["store"]=store
+    
+    return data
+  
+  def create(self,validated_data):
+    userStore=UserShopifyStore.objects.create(
+      user=self.user,
+      store=validated_data["store"],
+      access_token=validated_data["access_token"]
+    )
+    return userStore
 
 class ShopifyStoreSerializer(serializers.Serializer):
   id=serializers.IntegerField(read_only=True)
