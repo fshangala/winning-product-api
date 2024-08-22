@@ -58,6 +58,8 @@ class AddUserShopifyStoreByUrlSerializer(serializers.Serializer):
     if serializer.is_valid():
       store=serializer.save()
       data["store"]=store
+    else:
+      raise serializers.ValidationError(serializer.errors)
     
     return data
   
