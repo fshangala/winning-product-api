@@ -9,8 +9,9 @@ class ShopifyProduct:
     if not "/products/" in url:
       raise Exception(f"{url} is not a shopify product!")
     urlp=urlparse(url=url)
-    self.url=urlp.scheme+"://"+urlp.hostname+"/"+urlp.path+".json"
+    self.url=urlp.scheme+"://"+urlp.hostname+urlp.path+".json"
     response = requests.get(self.url)
+    print(self.url)
     data = response.json()
     try:
       self.data=data["product"]
@@ -29,7 +30,7 @@ class Shopify:
     try:
       self.shopify_url = list(filter(lambda x: x.startswith("Shopify.shop"),lines))[0]
     except Exception as e:
-      raise Exception(f"{url} does not appear to be a shopify store: f{str(e)}")
+      raise Exception(f"{url} does not appear to be a shopify store: {str(e)}")
     self.shopify_url = self.shopify_url.split("=")[1]
     self.shopify_url = self.shopify_url.split(";")[0]
     self.shopify_url = re.sub(" +","",self.shopify_url)

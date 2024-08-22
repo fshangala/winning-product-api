@@ -189,13 +189,13 @@ class ImportProductSerializer(serializers.Serializer):
     try:
       self.product=shopify.ShopifyProduct(data["product_url"])
     except Exception as e:
-      raise serializers.ValidationError(str(e))
+      raise serializers.ValidationError("Product: "+str(e))
     
     try:
       store=shopify.Shopify(data["store_url"])
       self.store=self.user.my_stores.get(store__url=store.url)
     except Exception as e:
-      raise serializers.ValidationError(str(e))
+      raise serializers.ValidationError("Store: "+str(e))
     
     return data
   
