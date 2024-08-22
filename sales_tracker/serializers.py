@@ -200,7 +200,7 @@ class ImportProductSerializer(serializers.Serializer):
     return data
   
   def create(self,validated_data):
-    response=requests.post(url=f"https://{self.store.store.shopify_url}/admin/api/2024-07/products.json",data={
+    response=requests.post(url=f"https://{self.store.store.shopify_url}/admin/api/2024-07/products.json",json={
       "product":{
         "title":self.product.data["title"],
         "body_html":self.product.data["body_html"],
