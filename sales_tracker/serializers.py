@@ -198,20 +198,26 @@ class ImportProductSerializer(serializers.Serializer):
     return data
   
   def create(self,validated_data):
-    response=requests.post(url=f"{self.store.store.shopify_url}/admin/api/2024-07/products.json",data={
+    response=requests.post(url=f"https://{self.store.store.shopify_url}/admin/api/2024-07/products.json",data={
       "product":{
-        "title":self.product["title"],
-        "body_html":self.product["body_html"],
-        "vendor":self.product["vendor"],
-        "product_type":self.product["product_type"],
+        "title":self.product.data["title"],
+        "body_html":self.product.data["body_html"],
+        "vendor":self.product.data["vendor"],
+        "product_type":self.product.data["product_type"],
         "status":"draft"
       }
     },headers={
       "X-Shopify-Access-Token":f"{self.store.access_token}",
       "Content-Type":"application/json",
     })
-    logger.info(response.json())
-    return response.json()
+    # logger.info(response.json())
+    try:
+      data=response.json()
+    except Exception as e:
+      logger.error(e)
+      data={"status":response.status_code,"content":response.text}
+      
+    return data
 
 class RequestImportProductSerializer(serializers.Serializer):
   product_url=serializers.URLField()

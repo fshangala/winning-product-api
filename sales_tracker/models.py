@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 class ShopifyStore(models.Model):
   title=models.CharField(max_length=200)
   url=models.URLField(unique=True)
-  hostname=models.CharField(max_length=200)
+  hostname=models.CharField(max_length=200,unique=True)
   themedata=models.JSONField()
   shopify_url=models.CharField(max_length=200)
   locale=models.CharField(max_length=200)

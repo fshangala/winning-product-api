@@ -6,9 +6,11 @@ import re
 
 class ShopifyProduct:
   def __init__(self,url):
-    extractedUrl = url
-    # extractedUrl = url.split("?")[0]
-    response = requests.get(extractedUrl+".json")
+    if not "/products/" in url:
+      raise Exception(f"{url} is not a shopify product!")
+    urlp=urlparse(url=url)
+    self.url=urlp.scheme+"://"+urlp.hostname+"/"+urlp.path+".json"
+    response = requests.get(self.url)
     data = response.json()
     try:
       self.data=data["product"]
@@ -17,7 +19,11 @@ class ShopifyProduct:
 
 class Shopify:
   def __init__(self,url) -> None:
-    response = requests.get(url)
+    urlp=urlparse(url=url)
+    self.hostname=urlp.hostname
+    self.url=urlp.scheme+"://"+urlp.hostname
+    
+    response = requests.get(self.url)
     lines = response.text.splitlines()
     themeDataList = list(filter(lambda x: x.startswith("Shopify.theme"),lines))
     if len(themeDataList) > 0:
@@ -45,10 +51,6 @@ class Shopify:
     self.currency = re.sub(";","",self.currency)
     self.currency = re.sub(" +","",self.currency)
     self.currency = json.loads(str(self.currency))
-    
-    urlp=urlparse(url)
-    self.url=urlp.geturl()
-    self.hostname=urlp.hostname
 
     soup = BeautifulSoup(response.text, 'html.parser')
     titleElement=soup.select("title")

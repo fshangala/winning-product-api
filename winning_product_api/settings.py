@@ -231,6 +231,21 @@ LOGGING = {
             "level": "DEBUG",
             "propagate": True,
         },
+        "sales_tracker": {
+            "handlers": ["file","stream"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+        "accounts": {
+            "handlers": ["file","stream"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+        "ScraperSDK": {
+            "handlers": ["file","stream"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
         "ApiSDK": {
             "handlers": ["file","stream"],
             "level": "DEBUG",

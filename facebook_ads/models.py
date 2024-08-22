@@ -1,6 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
 from sales_tracker.models import ShopifyStore
+from ScraperSDK import shopify
+import logging
+
+logger = logging.getLogger(__file__)
 
 # Create your models here.
 class AdCountry(models.Model):
@@ -50,6 +54,19 @@ class FacebookAd(models.Model):
   cta_text=models.CharField(max_length=200,null=True)
   country=models.ForeignKey(to=AdCountry,on_delete=models.CASCADE,related_name='ads')
   shopifyStore=models.ForeignKey(to=ShopifyStore,on_delete=models.CASCADE,related_name="facebook_ads",null=True)
+  
+  @property
+  def shopifyProduct(self):
+    if self.shopifyStore:
+      try:
+        product=shopify.ShopifyProduct(self.link_url)
+      except Exception as e:
+        logger.error(e)
+        return None
+      else:
+        return product.data
+    else:
+      return None
   
   def __str__(self):
     return str(self.ad_archive_id)
