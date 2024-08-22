@@ -25,19 +25,23 @@ class Shopify:
     
     response = requests.get(self.url)
     lines = response.text.splitlines()
+    
+    try:
+      self.shopify_url = list(filter(lambda x: x.startswith("Shopify.shop"),lines))[0]
+    except Exception as e:
+      raise Exception(f"{url} does not appear to be a shopify store: f{str(e)}")
+    self.shopify_url = self.shopify_url.split("=")[1]
+    self.shopify_url = self.shopify_url.split(";")[0]
+    self.shopify_url = re.sub(" +","",self.shopify_url)
+    self.shopify_url = str(re.sub("\"","",self.shopify_url))
+    
     themeDataList = list(filter(lambda x: x.startswith("Shopify.theme"),lines))
     if len(themeDataList) > 0:
       self.themeData = themeDataList[0].split("=")[1]
       self.themeData = self.themeData.split(";")[0]
       self.themeData = json.loads(self.themeData)
     else:
-      raise Exception(f"{self.url} does not appear to be a shopify store")
-    
-    self.shopify_url = list(filter(lambda x: x.startswith("Shopify.shop"),lines))[0]
-    self.shopify_url = self.shopify_url.split("=")[1]
-    self.shopify_url = self.shopify_url.split(";")[0]
-    self.shopify_url = re.sub(" +","",self.shopify_url)
-    self.shopify_url = str(re.sub("\"","",self.shopify_url))
+      self.themeData={}
     
     self.locale = list(filter(lambda x: x.startswith("Shopify.locale"),lines))[0]
     self.locale = re.sub("Shopify.locale.*=","",self.locale)
