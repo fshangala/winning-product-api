@@ -31,7 +31,7 @@ class Shopify:
       self.themeData = self.themeData.split(";")[0]
       self.themeData = json.loads(self.themeData)
     else:
-      raise Exception(f"{url} does not appear to be a shopify store")
+      raise Exception(f"{self.url} does not appear to be a shopify store")
     
     self.shopify_url = list(filter(lambda x: x.startswith("Shopify.shop"),lines))[0]
     self.shopify_url = self.shopify_url.split("=")[1]
