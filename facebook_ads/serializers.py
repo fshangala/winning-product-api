@@ -11,6 +11,7 @@ from django.db.models import Q
 from django.utils import timezone
 from django.contrib.auth.models import User
 from accounts.serializers import UserSerializer
+from sales_tracker.serializers import ShopifyStoreSerializer
 
 search_keyword_in_choices=(
   ('All','All'),
@@ -119,6 +120,8 @@ class FacebookAdSerializer(serializers.Serializer):
   caption=serializers.CharField(required=False)
   cta_text=serializers.CharField()
   country=FacebookAdCountrySerializer()
+  shopifyStore=ShopifyStoreSerializer(many=False,read_only=True)
+  shopifyProduct=serializers.JSONField(read_only=True)
   
 class SavedFacebookAdSerializer(serializers.Serializer):
   id=serializers.IntegerField(read_only=True)
