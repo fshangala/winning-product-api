@@ -1,9 +1,11 @@
 from ApiSDK.meta_ad_library import MetaAdLibrary
-from ScraperSDK.shopify import Shopify
+from ScraperSDK.shopify import Shopify, ShopifyProduct
 from facebook_ads.models import FacebookAd, FacebookPage, FacebookCreative, AdCountry
 from sales_tracker.serializers import AddShopifyStoreByUrlSerializer
+from sales_tracker.models import ShopifyStore
 from django.utils import timezone
 import logging
+from websites.models import Website
 
 logger = logging.getLogger("ApiSDK.load_facebook_ads")
 
@@ -60,17 +62,24 @@ def save_ad(ad:dict,country_code:str):
       except Exception as e:
         logger.error(str(e))
       else:
-        storeSerializer=AddShopifyStoreByUrlSerializer(data={
-          "title":store.title,
-          "url":store.url,
-          "hostname":store.hostname,
-          "themedata":store.themeData,
-          "shopify_url":store.shopify_url,
-          "locale":store.locale,
-          "currency":store.currency,
-        })
-        if storeSerializer.is_valid():
-          adObj.shopifyStore=storeSerializer.save()
+        try:
+          website=Website.objects.get(name="shopify")
+        except Website.DoesNotExist:
+          website=Website.objects.create(
+            name="shopify"
+          )
+        adObj.website=website
+        
+        shopifyStore=ShopifyStore.objects.create(
+          title=store.title,
+          url=store.url,
+          hostname=store.hostname,
+          themeData=store.themeData,
+          shopify_url=store.shopify_url,
+          locale=store.locale,
+          currency=store.currency,
+        )
+        adObj.shopifyStore = shopifyStore
       
       adObj.save()
       return adObj

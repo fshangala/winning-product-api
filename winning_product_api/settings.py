@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'accounts',
     'sales_tracker',
     'facebook_ads',
+    'websites',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -247,6 +248,11 @@ LOGGING = {
             "propagate": True,
         },
         "ApiSDK": {
+            "handlers": ["file","stream"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+        "websites": {
             "handlers": ["file","stream"],
             "level": "DEBUG",
             "propagate": True,

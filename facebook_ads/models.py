@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from sales_tracker.models import ShopifyStore
 from ScraperSDK import shopify
 import logging
+from websites.models import Website
 
 logger = logging.getLogger(__file__)
 
@@ -54,6 +55,7 @@ class FacebookAd(models.Model):
   cta_text=models.CharField(max_length=200,null=True)
   country=models.ForeignKey(to=AdCountry,on_delete=models.CASCADE,related_name='ads')
   shopifyStore=models.ForeignKey(to=ShopifyStore,on_delete=models.CASCADE,related_name="facebook_ads",null=True)
+  website=models.ForeignKey(to=Website,on_delete=models.CASCADE,related_name="facebook_ads",null=True)
   
   @property
   def shopifyProduct(self):
