@@ -9,6 +9,7 @@ from facebook_ads.serializers import (
   FacebookAdSerializer,
   SavedFacebookAdSerializer,
   SaveFacebookAdSerializer,
+  LoadFacebookAdsSerializer,
 )
 from facebook_ads.models import FacebookAd
 
@@ -58,4 +59,16 @@ class SavedFacebookAdViewSet(ViewSet):
       return Response(data=self.serializer_class(instance=saved_ad).data)
     else:
       return Response(data=serializer.errors,status=400)
-    
+
+class LoadFacebookAdsViewSet(ViewSet):
+  """Loads facebook ads from json"""
+  permission_classes=[]
+  serializer_class=LoadFacebookAdsSerializer
+  
+  def create(self,request):
+    serializer=self.serializer_class(data=request.data)
+    if serializer.is_valid():
+      response = serializer.save()
+      return Response(data=response)
+    else:
+      return Response(data=serializer.errors,status=400)

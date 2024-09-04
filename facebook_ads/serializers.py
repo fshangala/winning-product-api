@@ -13,6 +13,7 @@ from django.contrib.auth.models import User
 from accounts.serializers import UserSerializer
 from sales_tracker.serializers import ShopifyStoreSerializer
 from websites.serializers import WebsiteSerializer
+from ApiSDK.load_facebook_ads import save_ads
 
 search_keyword_in_choices=(
   ('All','All'),
@@ -159,3 +160,10 @@ class SaveFacebookAdSerializer(serializers.Serializer):
       user=self.user
     )
     return saved_ad
+
+class LoadFacebookAdsSerializer(serializers.Serializer):
+  ads_data=serializers.JSONField()
+  
+  def create(self,validated_data):
+    save_ads(validated_data["ads_data"])
+    return validated_data

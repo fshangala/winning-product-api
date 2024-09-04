@@ -88,7 +88,26 @@ def save_ad(ad:dict,country_code:str):
   else:
     return None
 
+def save_ads(ads):
+  """Save ads queried by the search_ads function
+
+  Args:
+      ads (_type_): an Array of adsets
+  """
+  if "results" in ads:
+    for adset in ads["results"]:
+      for ad in adset:
+        save_ad(ad,ads['country_code'])
+
 def search_ads(search_term:str,country_code:str,continuation_token=None,count=0):
+  """Query ads from the meta ads library
+
+  Args:
+      search_term (str): the search term for the ads
+      country_code (str): country in which to search the ads
+      continuation_token (_type_, optional): if its a continuation of the previous search provide this. Defaults to None.
+      count (int, optional): the page index. Defaults to 0.
+  """
   delta = count+1
   meta=MetaAdLibrary()
   try:
@@ -96,10 +115,7 @@ def search_ads(search_term:str,country_code:str,continuation_token=None,count=0)
   except Exception as e:
     logger.error(str(e))
   else:
-    if "results" in ads:
-      for adset in ads["results"]:
-        for ad in adset:
-          save_ad(ad,ads['country_code'])
-    
-      if not ads["is_result_complete"] and delta < 6:
-        search_ads(search_term=search_term,country_code=country_code,continuation_token=ads["continuation_token"],count=delta)
+    save_ads(ads)
+  
+    if not ads["is_result_complete"] and delta < 6:
+      search_ads(search_term=search_term,country_code=country_code,continuation_token=ads["continuation_token"],count=delta)
