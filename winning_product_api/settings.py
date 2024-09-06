@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'sales_tracker',
     'facebook_ads',
     'websites',
+    'site_settings',
 
     'django.contrib.admin',
     'django.contrib.auth',
