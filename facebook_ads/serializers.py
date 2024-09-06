@@ -160,10 +160,3 @@ class SaveFacebookAdSerializer(serializers.Serializer):
       user=self.user
     )
     return saved_ad
-
-class LoadFacebookAdsSerializer(serializers.Serializer):
-  ads_data=serializers.JSONField()
-  
-  def create(self,validated_data):
-    save_ads(validated_data["ads_data"])
-    return validated_data
