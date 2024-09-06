@@ -42,28 +42,32 @@ class FacebookAdSearchSerializer(serializers.Serializer):
   randomize=serializers.BooleanField(required=False,default=False,initial=False)
   
   def retrieve(self):
-    if not self.validated_data['offset'] > 0 and self.validated_data.get('search_term') != None:
+    offset=self.validated_data.get("offset")
+    search_term=self.validated_data.get('search_term')
+    country_code=self.validated_data.get('country_code')
+    
+    if not offset > 0 and search_term:
       t=threading.Thread(
         target=load_facebook_ads.search_ads,
         name="search-ads",
         daemon=True,
-        args=(self.validated_data['search_term'],self.validated_data['country_code'])
+        args=(self.validated_data['search_term'],country_code)
       )
       t.start()
     
     ads = FacebookAd.objects.all()
     
     # search_keyword_id
-    if self.validated_data.get('search_term'):
-      if self.validated_data['search_keyword_in'] == 'adtext':
+    search_keyword_in=self.validated_data.get('search_keyword_in')
+    if search_term and search_keyword_in:
+      if search_keyword_in == 'adtext':
         ads=ads.filter(Q(body_html__contains=self.validated_data['search_term']))
-      elif self.validated_data['search_keyword_in'] == 'pagename':
+      elif search_keyword_in == 'pagename':
         ads=ads.filter(Q(page__name__contains=self.validated_data['search_term']))
-      elif self.validated_data['search_keyword_in'] == 'All':
+      elif search_keyword_in == 'All':
         ads=ads.filter(Q(page__name__contains=self.validated_data['search_term']) | Q(body_html__contains=self.validated_data['search_term']))
     
     # country_code
-    country_code=self.validated_data.get('country_code')
     if country_code:
       ads = ads.filter(country__code=self.validated_data['country_code'])
     

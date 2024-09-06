@@ -70,16 +70,20 @@ def save_ad(ad:dict,country_code:str):
           )
         adObj.website=website
         
-        shopifyStore=ShopifyStore.objects.create(
-          title=store.title,
-          url=store.url,
-          hostname=store.hostname,
-          themeData=store.themeData,
-          shopify_url=store.shopify_url,
-          locale=store.locale,
-          currency=store.currency,
-        )
-        adObj.shopifyStore = shopifyStore
+        try:
+          shopifyStore=ShopifyStore.objects.get(hostname=store.hostname)
+        except ShopifyStore.DoesNotExist:
+          shopifyStore=ShopifyStore.objects.create(
+            title=store.title,
+            url=store.url,
+            hostname=store.hostname,
+            themedata=store.themeData,
+            shopify_url=store.shopify_url,
+            locale=store.locale,
+            currency=store.currency,
+          )
+        else:
+          adObj.shopifyStore = shopifyStore
       
       adObj.save()
       return adObj
@@ -99,7 +103,7 @@ def save_ads(ads):
       for ad in adset:
         save_ad(ad,ads['country_code'])
 
-def search_ads(search_term:str,country_code:str,continuation_token=None,count=0):
+def search_ads(search_term:str,country_code=None,continuation_token=None,count=0):
   """Query ads from the meta ads library
 
   Args:
@@ -116,6 +120,7 @@ def search_ads(search_term:str,country_code:str,continuation_token=None,count=0)
     logger.error(str(e))
   else:
     save_ads(ads)
-  
-    if not ads["is_result_complete"] and delta < 6:
-      search_ads(search_term=search_term,country_code=country_code,continuation_token=ads["continuation_token"],count=delta)
+
+    if "continuation_token" in ads:
+      if not ads["is_result_complete"] and delta < 6:
+        search_ads(search_term=search_term,country_code=country_code,continuation_token=ads["continuation_token"],count=delta)
