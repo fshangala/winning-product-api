@@ -2,7 +2,16 @@ from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers
 from sales_tracker.models import Store
-from sales_tracker.serializers import StoreSerializer, StoreAddSerializer, AddTrackingSiteSerializer, TrackDataSerializer
+from sales_tracker.serializers import (
+  StoreSerializer, StoreAddSerializer, 
+  AddTrackingSiteSerializer, 
+  TrackDataSerializer, 
+  ImportProductSerializer,
+  RequestImportProductSerializer,
+  RequestAddUserShopifyStoreByUrlSerializer,
+  AddUserShopifyStoreByUrlSerializer,
+  UserShopifyStoreSerializer,
+)
 from drf_spectacular.utils import extend_schema, inline_serializer
 from ScraperSDK.winninghunt import WinningHunt
 from ApiSDK.sales_tracker import SalesTracker
@@ -49,5 +58,41 @@ class TrackDataViewSet(ViewSet):
     if serializer.is_valid():
       trackData=serializer.save()
       return Response(data=StoreSerializer(instance=trackData.store).data,status=201)
+    else:
+      return Response(data=serializer.errors,status=400)
+
+class ImportProductViewSet(ViewSet):
+  permission_classes=[IsAuthenticatedOrTokenHasScope]
+  required_scopes=['read','write']
+  serializer_class=RequestImportProductSerializer
+  
+  @extend_schema(
+    responses={
+      201:RequestImportProductSerializer(many=False)
+    }
+  )
+  def create(self,request):
+    serializer = ImportProductSerializer(data=request.data,user=request.user)
+    if serializer.is_valid():
+      response=serializer.save()
+      return Response(data=response)
+    else:
+      return Response(data=serializer.errors,status=400)
+
+class UserShopifyStoreViewSet(ViewSet):
+  serializer_class=RequestAddUserShopifyStoreByUrlSerializer
+  permission_classes=[IsAuthenticatedOrTokenHasScope]
+  required_scopes=['read','write']
+  
+  @extend_schema(
+    responses={
+      201:UserShopifyStoreSerializer()
+    }
+  )
+  def create(self,request):
+    serializer=AddUserShopifyStoreByUrlSerializer(data=request.data,user=request.user)
+    if serializer.is_valid():
+      userStore=serializer.save()
+      return Response(data=UserShopifyStoreSerializer(instance=userStore).data)
     else:
       return Response(data=serializer.errors,status=400)

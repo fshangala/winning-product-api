@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'accounts',
     'sales_tracker',
     'facebook_ads',
+    'websites',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -94,15 +95,25 @@ WSGI_APPLICATION = 'winning_product_api.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if env("DJANGO_ENVIRONMENT") == "live":
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': env('MYSQL_DATABASE'),
+            'USER': env('MYSQL_USER'),
+            'PASSWORD': env('MYSQL_PASSWORD'),
+            'HOST': env('MYSQL_HOST'),
+            'PORT': env('MYSQL_PORT'),
+        }
     }
-}
-
-
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+    
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
@@ -231,7 +242,27 @@ LOGGING = {
             "level": "DEBUG",
             "propagate": True,
         },
+        "sales_tracker": {
+            "handlers": ["file","stream"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+        "accounts": {
+            "handlers": ["file","stream"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+        "ScraperSDK": {
+            "handlers": ["file","stream"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
         "ApiSDK": {
+            "handlers": ["file","stream"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+        "websites": {
             "handlers": ["file","stream"],
             "level": "DEBUG",
             "propagate": True,

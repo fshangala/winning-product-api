@@ -12,6 +12,7 @@ from rest_framework import serializers
 from oauth2_provider.models import Application, AccessToken, RefreshToken
 from django.utils import timezone
 from oauthlib import common
+from oauth2_provider.contrib.rest_framework.permissions import TokenHasReadWriteScope, IsAuthenticatedOrTokenHasScope
 
 # Create your views here.
 class OAuthTokenView(TokenView,APIView):
@@ -94,6 +95,8 @@ class LoginWithGoogleViewSet(ViewSet):
 
 class MeViewSet(ViewSet):
   serializer_class=UserSerializer
+  permission_classes=[IsAuthenticatedOrTokenHasScope]
+  required_scopes=["read"]
   
   def list(self,request):
     serializer=self.serializer_class(instance=request.user,many=False)

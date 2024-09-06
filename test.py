@@ -1,10 +1,8 @@
-from ScraperSDK import shopify
+from urllib.parse import urlparse
 
-shop = shopify.Shopify("https://mycustom-cars.com")
-print(shop.themeData)
-print(shop.hostname)
-print(shop.title)
-print(shop.url)
-print(shop.shopify_url)
-print(shop.locale)
-print(shop.currency)
+url="https://norvure.com/products/freshlock%E2%84%A2-mason-jar-vacuum-sealer"
+print("/products/" in url)
+
+urlp=urlparse(url=url)
+
+print(urlp.scheme,urlp.hostname,urlp.path)

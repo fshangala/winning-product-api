@@ -12,3 +12,15 @@ class FacebookAdsTests(APITestCase):
     response = self.client.get("/facebook-ads/search/?search_term=monkey?country_code=FR")
     print(response.json())
     self.assertEqual(response.status_code,200)
+  
+  def test_save_ad(self):
+    response=self.client.post(
+      path="/facebook-ads/saved-facebook-ads/",
+      data={
+        "ad":1,
+      },
+      content_type="application/json"
+    )
+    print(response.json())
+    self.assertEqual(response.status_code,201)
+    

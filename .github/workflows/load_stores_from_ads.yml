@@ -1,4 +1,4 @@
-name: SSH Deploy - Refresh
+name: SSH Deploy - Load stores from ads
 on:
   workflow_dispatch:
 jobs:
@@ -15,11 +15,6 @@ jobs:
           command_timeout: 30m
           script: |
             cd /data/winning-product-api/
-            systemctl stop copiwinapi
             git checkout dev
-            git pull
-            rm -f db.sqlite3
             source venv/bin/activate
-            python manage.py migrate
-            python manage.py createsuperuser --no-input
-            systemctl start copiwinapi
+            python manage.py load_stores_from_ads
