@@ -33,10 +33,10 @@ sort_direction_choices=(
 )
 class FacebookAdSearchSerializer(serializers.Serializer):
   search_term=serializers.CharField(required=False)
-  country_code=serializers.CharField(required=False,default="FR",initial="FR")
-  search_keyword_in=serializers.ChoiceField(choices=search_keyword_in_choices,required=False,default="All",initial="All")
-  media_type=serializers.ChoiceField(choices=media_type_choices,default='all',initial='all',required=False)
-  sort_direction=serializers.ChoiceField(choices=sort_direction_choices,default='asc',initial='asc',required=False)
+  country_code=serializers.CharField(required=False)
+  search_keyword_in=serializers.ChoiceField(choices=search_keyword_in_choices,required=False)
+  media_type=serializers.ChoiceField(choices=media_type_choices,required=False)
+  sort_direction=serializers.ChoiceField(choices=sort_direction_choices,required=False)
   ad_creation_date=serializers.CharField(required=False)
   offset=serializers.IntegerField(default=0,initial=0,required=False)
   randomize=serializers.BooleanField(required=False,default=False,initial=False)
@@ -63,24 +63,30 @@ class FacebookAdSearchSerializer(serializers.Serializer):
         ads=ads.filter(Q(page__name__contains=self.validated_data['search_term']) | Q(body_html__contains=self.validated_data['search_term']))
     
     # country_code
-    if self.validated_data['country_code'] != 'ALL':
+    country_code=self.validated_data.get('country_code')
+    if country_code:
       ads = ads.filter(country__code=self.validated_data['country_code'])
     
     # media_type
-    if self.validated_data['media_type'] == 'videos':
-      ads = ads.filter(video__isnull=False)
-    elif self.validated_data['media_type'] == 'images':
-      ads = ads.filter(image__isnull=False)
+    media_type=self.validated_data.get('media_type')
+    if media_type:
+      if self.validated_data['media_type'] == 'videos':
+        ads = ads.filter(video__isnull=False)
+      elif self.validated_data['media_type'] == 'images':
+        ads = ads.filter(image__isnull=False)
     
     # sort_direction
-    if self.validated_data['sort_direction'] == 'asc':
-      ads = ads.order_by("body_html")
-    elif self.validated_data['sort_direction'] == 'desc':
-      ads = ads.order_by("-body_html")
+    sort_direction=self.validated_data.get('sort_direction')
+    if sort_direction:
+      if self.validated_data['sort_direction'] == 'asc':
+        ads = ads.order_by("body_html")
+      elif self.validated_data['sort_direction'] == 'desc':
+        ads = ads.order_by("-body_html")
     
     # ad_creation_date
-    if self.validated_data.get('ad_creation_date') != None:
-      ad_creation_date=self.validated_data['ad_creation_date'].split(' - ')
+    ad_creation_date=self.validated_data.get('ad_creation_date')
+    if ad_creation_date:
+      ad_creation_date=ad_creation_date.split(' - ')
       print(ad_creation_date)
       ad_creation_date_start=timezone.datetime.strptime(ad_creation_date[0],"%d/%m/%Y")
       ad_creation_date_stop=timezone.datetime.strptime(ad_creation_date[1],"%d/%m/%Y")
