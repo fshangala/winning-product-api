@@ -1,14 +1,10 @@
 name: SSH Deploy
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - dev
   pull_request:
     types:
       - closed
     branches:
-      - dev
       - main
 jobs:
   ssh-deploy:
@@ -24,7 +20,7 @@ jobs:
           command_timeout: 30m
           script: |
             cd /data/winning-product-api/
-            git checkout dev
+            git checkout main
             git pull
             source venv/bin/activate
             python manage.py migrate
