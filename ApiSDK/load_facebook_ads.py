@@ -6,6 +6,7 @@ from sales_tracker.models import ShopifyStore
 from django.utils import timezone
 import logging
 from websites.models import Website
+from site_settings.models import SiteSettings
 
 logger = logging.getLogger("ApiSDK.load_facebook_ads")
 

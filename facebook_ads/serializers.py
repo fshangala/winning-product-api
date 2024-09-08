@@ -14,6 +14,7 @@ from accounts.serializers import UserSerializer
 from sales_tracker.serializers import ShopifyStoreSerializer
 from websites.serializers import WebsiteSerializer
 from ApiSDK.load_facebook_ads import save_ads
+from site_settings.functions import getSiteSettings
 
 search_keyword_in_choices=(
   ('All','All'),
@@ -46,14 +47,16 @@ class FacebookAdSearchSerializer(serializers.Serializer):
     search_term=self.validated_data.get('search_term')
     country_code=self.validated_data.get('country_code')
     
-    if not offset > 0 and search_term:
-      t=threading.Thread(
-        target=load_facebook_ads.search_ads,
-        name="search-ads",
-        daemon=True,
-        args=(self.validated_data['search_term'],country_code)
-      )
-      t.start()
+    siteSettings=getSiteSettings()
+    if siteSettings.auto_load_facebook_ads:
+      if not offset > 0 and search_term:
+        t=threading.Thread(
+          target=load_facebook_ads.search_ads,
+          name="search-ads",
+          daemon=True,
+          args=(self.validated_data['search_term'],country_code)
+        )
+        t.start()
     
     ads = FacebookAd.objects.all()
     
