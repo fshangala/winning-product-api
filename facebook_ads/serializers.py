@@ -60,15 +60,16 @@ class FacebookAdSearchSerializer(serializers.Serializer):
     
     ads = FacebookAd.objects.all()
     
-    # search_keyword_id
+    # search_keyword_in
     search_keyword_in=self.validated_data.get('search_keyword_in')
-    if search_term and search_keyword_in:
-      if search_keyword_in == 'adtext':
-        ads=ads.filter(Q(body_html__contains=self.validated_data['search_term']))
-      elif search_keyword_in == 'pagename':
-        ads=ads.filter(Q(page__name__contains=self.validated_data['search_term']))
-      elif search_keyword_in == 'All':
-        ads=ads.filter(Q(page__name__contains=self.validated_data['search_term']) | Q(body_html__contains=self.validated_data['search_term']))
+    if search_term:
+      if search_keyword_in:
+        if search_keyword_in == 'adtext':
+          ads=ads.filter(Q(body_html__icontains=self.validated_data['search_term']))
+        elif search_keyword_in == 'pagename':
+          ads=ads.filter(Q(page__name__icontains=self.validated_data['search_term']))
+      else:
+        ads=ads.filter(Q(page__name__icontains=self.validated_data['search_term']) | Q(body_html__icontains=self.validated_data['search_term']))
     
     # country_code
     if country_code:
