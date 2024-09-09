@@ -73,7 +73,11 @@ class FacebookAdSearchSerializer(serializers.Serializer):
     
     # country_code
     if country_code:
-      ads = ads.filter(country__code=self.validated_data['country_code'])
+      countries=country_code.split(",")
+      q=ads.filter(country__code=countries[0])
+      if len(countries) > 1:
+        for country in countries[1:]:
+          q=q.union(ads.filter(country__code=country))
     
     # media_type
     media_type=self.validated_data.get('media_type')
