@@ -6,6 +6,7 @@ from sales_tracker.models import ShopifyStore
 from django.utils import timezone
 import logging
 from websites.models import Website
+from websites.website_detector import WebsiteDetector
 from site_settings.models import SiteSettings
 
 logger = logging.getLogger("ApiSDK.load_facebook_ads")
@@ -58,19 +59,22 @@ def save_ad(ad:dict,country_code:str):
         adObj.video=ad['snapshot']['videos'][0]['video_sd_url']
         adObj.video_preview=ad['snapshot']['videos'][0]['video_preview_image_url']
       
+      wd=WebsiteDetector(ad['snapshot']['link_url'])
+      site=wd.detect()
+      if site:
+        try:
+          website=Website.objects.get(name=site.name)
+        except Website.DoesNotExist:
+          website=Website.objects.create(
+            name=site.name
+          )
+        adObj.website=website
+      
       try:
         store=Shopify(url=ad['snapshot']['link_url'])
       except Exception as e:
         logger.error(str(e))
-      else:
-        try:
-          website=Website.objects.get(name="shopify")
-        except Website.DoesNotExist:
-          website=Website.objects.create(
-            name="shopify"
-          )
-        adObj.website=website
-        
+      else:        
         try:
           shopifyStore=ShopifyStore.objects.get(hostname=store.hostname)
         except ShopifyStore.DoesNotExist:
