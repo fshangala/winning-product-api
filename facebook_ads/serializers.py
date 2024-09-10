@@ -35,6 +35,7 @@ sort_direction_choices=(
 class FacebookAdSearchSerializer(serializers.Serializer):
   search_term=serializers.CharField(required=False)
   country_code=serializers.CharField(required=False)
+  websites=serializers.CharField(required=False)
   search_keyword_in=serializers.ChoiceField(choices=search_keyword_in_choices,required=False)
   media_type=serializers.ChoiceField(choices=media_type_choices,required=False)
   sort_direction=serializers.ChoiceField(choices=sort_direction_choices,required=False)
@@ -80,6 +81,16 @@ class FacebookAdSearchSerializer(serializers.Serializer):
           q=q.union(ads.filter(country__code=country))
       ads=q
     
+    # websites
+    websites=self.validated_data.get('websites')
+    if websites:
+      the_websites=websites.split(",")
+      q=ads.filter(websites__name=the_websites[0])
+      if len(the_websites) > 1:
+        for the_website in the_websites:
+          q=q.union(ads.filter(websites__name=the_website))
+      ads=q
+      
     # media_type
     media_type=self.validated_data.get('media_type')
     if media_type:
