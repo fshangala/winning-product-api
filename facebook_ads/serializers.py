@@ -15,6 +15,7 @@ from sales_tracker.serializers import ShopifyStoreSerializer
 from websites.serializers import WebsiteSerializer
 from ApiSDK.load_facebook_ads import save_ads
 from site_settings.functions import getSiteSettings
+from languages.serializers import LanguageSerializer
 
 search_keyword_in_choices=(
   ('All','All'),
@@ -90,6 +91,16 @@ class FacebookAdSearchSerializer(serializers.Serializer):
         for the_website in the_websites:
           q=q.union(ads.filter(websites__name=the_website))
       ads=q
+    
+    # languages
+    languages=self.validated_data.get('languages')
+    if languages:
+      the_languages=languages.split(",")
+      q=ads.filter(languages__name=the_languages[0])
+      if len(the_languages) > 1:
+        for the_language in the_languages:
+          q=q.union(ads.filter(languages__name=the_language))
+      ads=q
       
     # media_type
     media_type=self.validated_data.get('media_type')
@@ -155,6 +166,7 @@ class FacebookAdSerializer(serializers.Serializer):
   shopifyStore=ShopifyStoreSerializer(many=False,read_only=True)
   shopifyProduct=serializers.JSONField(read_only=True)
   website=WebsiteSerializer(many=False,read_only=True)
+  language=LanguageSerializer(many=False,read_only=True)
   
 class SavedFacebookAdSerializer(serializers.Serializer):
   id=serializers.IntegerField(read_only=True)
