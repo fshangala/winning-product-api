@@ -1,5 +1,6 @@
 from urllib.parse import urlparse
 from websites.website_detector_shopify import shopify_detector
+from websites.website_detector_shoplazza import shoplazza_detector
 
 class DetectedWebsite:
   def __init__(self,name):
@@ -10,7 +11,8 @@ class WebsiteDetector:
     urlp=urlparse(url)
     self.url=f"{urlp.scheme}://{urlp.hostname}{urlp.path}"
     self.detectors = [
-      shopify_detector
+      shopify_detector,
+      shoplazza_detector,
     ]
   
   def detect(self)->DetectedWebsite:
