@@ -14,31 +14,38 @@ logger = logging.getLogger("ApiSDK.load_facebook_ads")
 def save_ad(ad:dict,country_code:str):
   if ad['snapshot']['display_format'] in ['video','image']:
     try:
-      ad=FacebookAd.objects.get(ad_archive_id=ad['adArchiveID'])
+      adObj=FacebookAd.objects.get(ad_archive_id=ad['adArchiveID'])
     except FacebookAd.DoesNotExist as e:
+      logger.debug(e)
       try:
         page=FacebookPage.objects.get(page_id=ad["snapshot"]["page_id"])
       except FacebookPage.DoesNotExist as e:
+        logger.debug(e)
         page=FacebookPage.objects.create(
           page_id=ad['snapshot']['page_id'],
           name=ad['snapshot']['page_name'],
           profile_picture_url=ad['snapshot']['page_profile_picture_url']
         )
+        logger.debug(page.id)
       
       try:
         creative=FacebookCreative.objects.get(creative_id=int(ad['snapshot']['ad_creative_id']))
       except FacebookCreative.DoesNotExist as e:
+        logger.debug(e)
         creative=FacebookCreative.objects.create(
           creative_id=int(ad['snapshot']['ad_creative_id'])
         )
+      logger.debug(creative)
       
       try:
         ad_country=AdCountry.objects.get(code=country_code)
-      except AdCountry.DoesNotExist:
+      except AdCountry.DoesNotExist as e:
+        logger.debug(e)
         ad_country=AdCountry.objects.create(
           code=country_code
         )
-        
+      logger.debug(ad_country)
+      
       adObj=FacebookAd.objects.create(
         page=page,
         ad_archive_id=ad['adArchiveID'],
@@ -94,6 +101,7 @@ def save_ad(ad:dict,country_code:str):
       return adObj
     else:
       return None
+    
   else:
     return None
 
@@ -107,6 +115,8 @@ def save_ads(ads):
     for adset in ads["results"]:
       for ad in adset:
         save_ad(ad,ads['country_code'])
+  else:
+    logger.warning(ads)
 
 def search_ads(search_term:str,country_code=None,continuation_token=None,count=0):
   """Query ads from the meta ads library
@@ -118,9 +128,12 @@ def search_ads(search_term:str,country_code=None,continuation_token=None,count=0
       count (int, optional): the page index. Defaults to 0.
   """
   delta = count+1
+  logger.info(f"#{delta} => search:{search_term}, country:{country_code}, continuation_token:{continuation_token}")
   meta=MetaAdLibrary()
+  
+  countries=country_code.split(",") if country_code else None
   try:
-    ads = meta.searchAds(search_term=search_term,country_code=country_code,continuation_token=continuation_token)
+    ads = meta.searchAds(search_term=search_term,country_code=countries[0] if countries else None,continuation_token=continuation_token)
   except Exception as e:
     logger.error(str(e))
   else:

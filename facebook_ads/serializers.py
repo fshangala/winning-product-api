@@ -16,6 +16,9 @@ from websites.serializers import WebsiteSerializer
 from ApiSDK.load_facebook_ads import save_ads
 from site_settings.functions import getSiteSettings
 from languages.serializers import LanguageSerializer
+import logging
+
+logger=logging.getLogger(__file__)
 
 search_keyword_in_choices=(
   ('All','All'),
@@ -36,7 +39,7 @@ sort_direction_choices=(
 class FacebookAdSearchSerializer(serializers.Serializer):
   search_term=serializers.CharField(required=False)
   search_keyword_in=serializers.ChoiceField(choices=search_keyword_in_choices,required=False)
-  country_code=serializers.CharField(required=False)
+  country_code=serializers.CharField(required=False,default="US",initial="US")
   websites=serializers.CharField(required=False)
   languages=serializers.CharField(required=False)
   active_adsets=serializers.CharField(required=False)
@@ -60,7 +63,7 @@ class FacebookAdSearchSerializer(serializers.Serializer):
     
     siteSettings=getSiteSettings()
     if siteSettings.auto_load_facebook_ads:
-      if not offset > 0 and search_term:
+      if offset == 0 and search_term:
         t=threading.Thread(
           target=load_facebook_ads.search_ads,
           name="search-ads",
