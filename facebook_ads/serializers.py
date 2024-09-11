@@ -15,6 +15,10 @@ from sales_tracker.serializers import ShopifyStoreSerializer
 from websites.serializers import WebsiteSerializer
 from ApiSDK.load_facebook_ads import save_ads
 from site_settings.functions import getSiteSettings
+from languages.serializers import LanguageSerializer
+import logging
+
+logger=logging.getLogger(__file__)
 
 search_keyword_in_choices=(
   ('All','All'),
@@ -34,11 +38,21 @@ sort_direction_choices=(
 )
 class FacebookAdSearchSerializer(serializers.Serializer):
   search_term=serializers.CharField(required=False)
-  country_code=serializers.CharField(required=False)
   search_keyword_in=serializers.ChoiceField(choices=search_keyword_in_choices,required=False)
-  media_type=serializers.ChoiceField(choices=media_type_choices,required=False)
+  country_code=serializers.CharField(required=False,default="US",initial="US")
+  websites=serializers.CharField(required=False)
+  languages=serializers.CharField(required=False)
+  active_adsets=serializers.CharField(required=False)
+  adspend=serializers.CharField(required=False)
+  sort_by=serializers.CharField(required=False)
   sort_direction=serializers.ChoiceField(choices=sort_direction_choices,required=False)
+  scaling=serializers.CharField(required=False)
+  media_type=serializers.ChoiceField(choices=media_type_choices,required=False)
+  page_type=serializers.CharField(required=False)
+  niche=serializers.CharField(required=False)
   ad_creation_date=serializers.CharField(required=False)
+  last_seen_date=serializers.CharField(required=False)
+  product_creation_date=serializers.CharField(required=False)
   offset=serializers.IntegerField(default=0,initial=0,required=False)
   randomize=serializers.BooleanField(required=False,default=False,initial=False)
   
@@ -49,7 +63,7 @@ class FacebookAdSearchSerializer(serializers.Serializer):
     
     siteSettings=getSiteSettings()
     if siteSettings.auto_load_facebook_ads:
-      if not offset > 0 and search_term:
+      if offset == 0 and search_term:
         t=threading.Thread(
           target=load_facebook_ads.search_ads,
           name="search-ads",
@@ -60,27 +74,51 @@ class FacebookAdSearchSerializer(serializers.Serializer):
     
     ads = FacebookAd.objects.all()
     
-    # search_keyword_id
+    # search_keyword_in
     search_keyword_in=self.validated_data.get('search_keyword_in')
-    if search_term and search_keyword_in:
-      if search_keyword_in == 'adtext':
-        ads=ads.filter(Q(body_html__contains=self.validated_data['search_term']))
-      elif search_keyword_in == 'pagename':
-        ads=ads.filter(Q(page__name__contains=self.validated_data['search_term']))
-      elif search_keyword_in == 'All':
-        ads=ads.filter(Q(page__name__contains=self.validated_data['search_term']) | Q(body_html__contains=self.validated_data['search_term']))
+    if search_term:
+      if search_keyword_in:
+        if search_keyword_in == 'adtext':
+          ads=ads.filter(Q(body_html__icontains=self.validated_data['search_term']))
+        elif search_keyword_in == 'pagename':
+          ads=ads.filter(Q(page__name__icontains=self.validated_data['search_term']))
+      else:
+        ads=ads.filter(Q(page__name__icontains=self.validated_data['search_term']) | Q(body_html__icontains=self.validated_data['search_term']))
     
     # country_code
     if country_code:
-      ads = ads.filter(country__code=self.validated_data['country_code'])
+      countries=country_code.split(",")
+      q=ads.filter(country__code=countries[0])
+      if len(countries) > 1:
+        for country in countries[1:]:
+          q=q.union(ads.filter(country__code=country))
+      ads=q
     
-    # media_type
-    media_type=self.validated_data.get('media_type')
-    if media_type:
-      if self.validated_data['media_type'] == 'videos':
-        ads = ads.filter(video__isnull=False)
-      elif self.validated_data['media_type'] == 'images':
-        ads = ads.filter(image__isnull=False)
+    # websites
+    websites=self.validated_data.get('websites')
+    if websites:
+      the_websites=websites.split(",")
+      q=ads.filter(websites__name=the_websites[0])
+      if len(the_websites) > 1:
+        for the_website in the_websites:
+          q=q.union(ads.filter(websites__name=the_website))
+      ads=q
+    
+    # languages
+    languages=self.validated_data.get('languages')
+    if languages:
+      the_languages=languages.split(",")
+      q=ads.filter(languages__code=the_languages[0])
+      if len(the_languages) > 1:
+        for the_language in the_languages:
+          q=q.union(ads.filter(languages__code=the_language))
+      ads=q
+    
+    # active adsets
+    
+    # adspend
+    
+    # sort by
     
     # sort_direction
     sort_direction=self.validated_data.get('sort_direction')
@@ -89,6 +127,20 @@ class FacebookAdSearchSerializer(serializers.Serializer):
         ads = ads.order_by("body_html")
       elif self.validated_data['sort_direction'] == 'desc':
         ads = ads.order_by("-body_html")
+        
+    # scaling
+    
+    # media_type
+    media_type=self.validated_data.get('media_type')
+    if media_type:
+      if self.validated_data['media_type'] == 'videos':
+        ads = ads.filter(video__isnull=False)
+      elif self.validated_data['media_type'] == 'images':
+        ads = ads.filter(image__isnull=False)
+        
+    # page type
+    
+    # niche
     
     # ad_creation_date
     ad_creation_date=self.validated_data.get('ad_creation_date')
@@ -98,6 +150,10 @@ class FacebookAdSearchSerializer(serializers.Serializer):
       ad_creation_date_start=timezone.datetime.strptime(ad_creation_date[0],"%d/%m/%Y")
       ad_creation_date_stop=timezone.datetime.strptime(ad_creation_date[1],"%d/%m/%Y")
       ads = ads.filter(creation_time__gte=ad_creation_date_start).filter(creation_time__lte=ad_creation_date_stop)
+      
+    # last seen date
+    
+    # product creation date
     
     if self.validated_data['randomize']:
       ads=ads.order_by('?')
@@ -138,6 +194,7 @@ class FacebookAdSerializer(serializers.Serializer):
   shopifyStore=ShopifyStoreSerializer(many=False,read_only=True)
   shopifyProduct=serializers.JSONField(read_only=True)
   website=WebsiteSerializer(many=False,read_only=True)
+  language=LanguageSerializer(many=False,read_only=True)
   
 class SavedFacebookAdSerializer(serializers.Serializer):
   id=serializers.IntegerField(read_only=True)

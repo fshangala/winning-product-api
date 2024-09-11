@@ -17,14 +17,14 @@ class AdCountry(models.Model):
 class FacebookPage(models.Model):
   page_id=models.BigIntegerField(unique=True)
   name=models.CharField(max_length=200)
-  profile_picture_url=models.URLField()
-  page_url=models.URLField(null=True)
+  profile_picture_url=models.TextField()
+  page_url=models.TextField(null=True)
   likes=models.IntegerField(default=0)
   ig_username=models.CharField(max_length=200,null=True)
   ig_followers=models.IntegerField(default=0)
   
   def __str__(self):
-    return str(self.name)
+    return self.name
 
 class FacebookCreative(models.Model):
   creative_id=models.BigIntegerField(unique=True)
@@ -44,9 +44,9 @@ class FacebookAd(models.Model):
   ad_creative=models.ForeignKey(to=FacebookCreative,on_delete=models.CASCADE,related_name='ads')
   display_format=models.CharField(max_length=200,choices=facebook_ad_display_format_choices)
   link_url=models.URLField(null=True)
-  image=models.URLField(null=True)
-  video=models.URLField(null=True)
-  video_preview=models.URLField(null=True)
+  image=models.TextField(null=True)
+  video=models.TextField(null=True)
+  video_preview=models.TextField(null=True)
   creation_time=models.DateTimeField()
   start_date=models.DateTimeField()
   end_date=models.DateTimeField()
