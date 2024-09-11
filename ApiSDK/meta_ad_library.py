@@ -17,10 +17,13 @@ class MetaAdLibrary:
     url=f"{self.baseUrl}/search/ads"
     queryParams={
       "query":search_term,
-      "country_code":country_code
     }
+    if country_code:
+      queryParams["country_code"]=country_code
     if continuation_token:
       queryParams["continuation_token"] = continuation_token
+      
+    logger.debug(queryParams)
       
     response=requests.get(
       url=url,
@@ -30,4 +33,6 @@ class MetaAdLibrary:
     responseData=response.json()
     if not "results" in responseData:
       logger.warning(str(responseData))
+    else:
+      logger.debug(f"{responseData['number_of_ads']} ads")
     return responseData
