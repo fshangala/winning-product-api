@@ -35,12 +35,21 @@ sort_direction_choices=(
 )
 class FacebookAdSearchSerializer(serializers.Serializer):
   search_term=serializers.CharField(required=False)
+  search_keyword_in=serializers.ChoiceField(choices=search_keyword_in_choices,required=False)
   country_code=serializers.CharField(required=False)
   websites=serializers.CharField(required=False)
-  search_keyword_in=serializers.ChoiceField(choices=search_keyword_in_choices,required=False)
-  media_type=serializers.ChoiceField(choices=media_type_choices,required=False)
+  languages=serializers.CharField(required=False)
+  active_adsets=serializers.CharField(required=False)
+  adspend=serializers.CharField(required=False)
+  sort_by=serializers.CharField(required=False)
   sort_direction=serializers.ChoiceField(choices=sort_direction_choices,required=False)
+  scaling=serializers.CharField(required=False)
+  media_type=serializers.ChoiceField(choices=media_type_choices,required=False)
+  page_type=serializers.CharField(required=False)
+  niche=serializers.CharField(required=False)
   ad_creation_date=serializers.CharField(required=False)
+  last_seen_date=serializers.CharField(required=False)
+  product_creation_date=serializers.CharField(required=False)
   offset=serializers.IntegerField(default=0,initial=0,required=False)
   randomize=serializers.BooleanField(required=False,default=False,initial=False)
   
@@ -96,19 +105,17 @@ class FacebookAdSearchSerializer(serializers.Serializer):
     languages=self.validated_data.get('languages')
     if languages:
       the_languages=languages.split(",")
-      q=ads.filter(languages__name=the_languages[0])
+      q=ads.filter(languages__code=the_languages[0])
       if len(the_languages) > 1:
         for the_language in the_languages:
-          q=q.union(ads.filter(languages__name=the_language))
+          q=q.union(ads.filter(languages__code=the_language))
       ads=q
-      
-    # media_type
-    media_type=self.validated_data.get('media_type')
-    if media_type:
-      if self.validated_data['media_type'] == 'videos':
-        ads = ads.filter(video__isnull=False)
-      elif self.validated_data['media_type'] == 'images':
-        ads = ads.filter(image__isnull=False)
+    
+    # active adsets
+    
+    # adspend
+    
+    # sort by
     
     # sort_direction
     sort_direction=self.validated_data.get('sort_direction')
@@ -117,6 +124,20 @@ class FacebookAdSearchSerializer(serializers.Serializer):
         ads = ads.order_by("body_html")
       elif self.validated_data['sort_direction'] == 'desc':
         ads = ads.order_by("-body_html")
+        
+    # scaling
+    
+    # media_type
+    media_type=self.validated_data.get('media_type')
+    if media_type:
+      if self.validated_data['media_type'] == 'videos':
+        ads = ads.filter(video__isnull=False)
+      elif self.validated_data['media_type'] == 'images':
+        ads = ads.filter(image__isnull=False)
+        
+    # page type
+    
+    # niche
     
     # ad_creation_date
     ad_creation_date=self.validated_data.get('ad_creation_date')
@@ -126,6 +147,10 @@ class FacebookAdSearchSerializer(serializers.Serializer):
       ad_creation_date_start=timezone.datetime.strptime(ad_creation_date[0],"%d/%m/%Y")
       ad_creation_date_stop=timezone.datetime.strptime(ad_creation_date[1],"%d/%m/%Y")
       ads = ads.filter(creation_time__gte=ad_creation_date_start).filter(creation_time__lte=ad_creation_date_stop)
+      
+    # last seen date
+    
+    # product creation date
     
     if self.validated_data['randomize']:
       ads=ads.order_by('?')

@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'facebook_ads',
     'websites',
     'site_settings',
+    'languages',
 
     'django.contrib.admin',
     'django.contrib.auth',
